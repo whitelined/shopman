@@ -83,18 +83,18 @@ abstract class CommonDataInterface{
 			case self::TYPE_ANY:
 				return true;
 			case self::TYPE_INT:
-				if(filter_var($data,FILTER_VALIDATE_INT)===false){
+				if(filter_var($data,FILTER_VALIDATE_INT)===false&&$data!==null){
 					return false;
 				}
 				return true;
 			case self::TYPE_NUMBER:
 			case self::TYPE_DECIMAL:
-				if(is_numeric($data)){
+				if(is_numeric($data)||$data==null){
 					return true;
 				}
 				return false;
 			case self::TYPE_STRING:
-				if(is_string($data)){
+				if(is_string($data)||$data==null){
 					return true;
 				}
 				return false;
@@ -222,8 +222,9 @@ abstract class CommonDataInterface{
 				"Set not defined for action '{$this->action}'.");
 		}
 		foreach($this->data['set'] as $k=>$v){
-			if($this->CheckType($k,$v)){
-				$this->sets[$k]=$v;
+			$value=($this->definitions[$k]->dataTransformer)($v);
+			if($this->CheckType($k,$value)){
+				$this->sets[$k]=$value;
 			}
 			else{
 				$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
@@ -293,12 +294,13 @@ abstract class CommonDataInterface{
 					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
 						"Value '{$k2}' not defined in column.");
 				}
-				if(!$this->CheckType($k2,$v[$k2])){
+				$value=($this->definitions[$k2]->dataTransformer)($v[$k2]);
+				if(!$this->CheckType($k2,$value)){
 					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
 					"Value for '{$k2}' not valid.");
 				}
 			}
-			$rows[]=$v;
+			$rows[]=$value;
 		}
 		$this->values=$rows;
 	}
@@ -346,10 +348,12 @@ abstract class CommonDataInterface{
 							$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
 								"Invalid operator {$v['operator']} for '$k'.");
 						}
-						if(!$this->CheckType($k,$v['comparison'],$v['operator'])){
+						$value=($this->definitions[$k]->dataTransformer)($v['comparison']);
+						if(!$this->CheckType($k,$value,$v['operator'])){
 							$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
-								"Comparison incompatible with column type.");
+								"Comparison '{$value}' incompatible with column {$k} type.");
 						}
+						$v['comparison']=$value;	
 						$this->filters[$k]=$v;
 					}
 				}

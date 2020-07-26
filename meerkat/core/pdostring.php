@@ -55,7 +55,7 @@ class PDOString{
 	}
 
 	private function FormatOperator($operator){
-		if($operator=='LIKE'||$operator=='NOT LIKE'){
+		if($operator=='LIKE'||$operator=='NOT LIKE'||$operator=='ILIKE'||$operator=='NOT ILIKE'){
 			return " {$operator} ";
 		}
 		return $operator;
@@ -98,6 +98,9 @@ class PDOString{
 	}
 
 	private function FormatWhereClause(string $name,array $where):string{
+		if($where['comparison']===null){
+			return "{$name} IS NULL";
+		}
 		if(!isset($where['operator'])){
 			$o=$this->DefaultOperator($name);
 		}
@@ -322,7 +325,6 @@ class PDOString{
 	public function WhereAnd(array $where):PDOString{
 		$filters=[];
 		foreach($where as $k=>$v){
-
 			$filters[]=$this->FormatWhereClause($k,$v);
 		}
 		if(count($filters)<1)

@@ -1,4 +1,12 @@
 import {DH} from './dh.js';
+const DEFAULT_SELECT_SEARCH_VALUE='..search..';
+const SEARCH_DELAY=300;
+
+export const COLUMN_TEXT='text';
+export const COLUMN_EDIT='edit';
+export const COLUMN_SELECT='select';
+export const COLUMN_CHECK='check';
+
 export class DataTable{
 	constructor(typer,elements,classes={}){
 		this.typer=typer;
@@ -13,6 +21,8 @@ export class DataTable{
 		this.selectedRows=[];
 		this.toolbarItems=[];
 		this.dataHandlers={};
+		this.searches={};
+		this.waiting=false;
 
 		if('up' in this.elements===false){
 			this.elements.up=DH.newWithText('span','\u21E7');
@@ -62,10 +72,36 @@ export class DataTable{
 		this.dataHandlers.view(this.viewSize,this.viewOffset);
 	}
 
+	setFilters(){
+		let filters={};
+		for(const k in this.searches){
+			let dataName=this.typer.getDataName(k);
+			let c=this.findColumn(k);
+			switch(c.type){
+				case COLUMN_TEXT:
+				case COLUMN_EDIT:
+					let val='%'+this.searches[k].currentValue+'%';
+					filters[dataName]={
+						operator:'ILIKE',
+						comparison: val
+					};
+					break;
+				case COLUMN_SELECT:
+					filters[dataName]={
+						operator:'=',
+						comparison:this.searches[k].currentValue
+					};
+					break;
+			}
+		}
+		this.dataHandlers.filters(filters);
+		this.dataHandlers.refresh();
+	}
+
 	/**
 	 * Sets a toolbar select list's options
 	 * @param {string} name Name of toolbar select element.
-	 * @param {array} options Array of objects containing 'value' and 'text'.
+	 * @param {array} options Array of objects containing 'value' and COLUMN_TEXT.
 	 * @param {string} name Name of value to be selected.
 	 */
 	setToolbarSelectList(name,options,selected=null){
@@ -115,7 +151,7 @@ export class DataTable{
 			name:name,
 			sortable:sortable,
 			searchable:searchable,
-			type:'text'
+			type:COLUMN_TEXT
 		});
 		return this;
 	}
@@ -129,7 +165,7 @@ export class DataTable{
 			name:name,
 			sortable:sortable,
 			searchable:searchable,
-			type:'edit'
+			type:COLUMN_EDIT
 		});
 		return this;
 	}
@@ -142,7 +178,7 @@ export class DataTable{
 		this.columns.push({
 			name:name,
 			sortable:sortable,
-			type:'select',
+			type:COLUMN_SELECT,
 			searchable:searchable
 		});
 		return this;
@@ -156,7 +192,7 @@ export class DataTable{
 		this.columns.push({
 			name:name,
 			sortable:sortable,
-			type:'check'
+			type:COLUMN_CHECK
 		});
 		return this;
 	}
@@ -190,13 +226,13 @@ export class DataTable{
 			td.dataset.name=c.name;
 			td.dataset.value=data[c.name];
 			switch(c.type){
-				case 'text':
-					this.renderText(td,data[c.name]);
+				case COLUMN_TEXT:
+					this.renderText(td,data[dataName]);
 					break;
-				case 'edit':
-					this.renderEdit(td,data[c.name]);
+				case COLUMN_EDIT:
+					this.renderEdit(td,data[dataName]);
 					break;
-				case 'select':
+				case COLUMN_SELECT:
 					this.renderSelect(td,c.name,data[dataName]);
 					break;
 			}
@@ -218,21 +254,26 @@ export class DataTable{
 		let div=DH.appendNew(th,'div');
 		div.className=this.classes.searchButton;
 		div.appendChild(this.elements.search.cloneNode(true));
-		let sdiv=DH.appendNew(div);
+		let sdiv=DH.appendNew(div,'div');
 		sdiv.className=this.classes.searchOutline;
+		sdiv.dataset.name=column.name;
 		switch(column.type){
-			case 'text':
-			case 'edit':
+			case COLUMN_TEXT:
+			case COLUMN_EDIT:
 				let input=DH.appendNew(sdiv,'input');
 				input.type='search';
 				input.placeholder='Search...';
+				input.addEventListener('input',e=>this.eventInputSearch(e));
 				break;
-			case 'select':
+			case COLUMN_SELECT:
 				let select=this.typer.generateFormElement(column.name);
 				let first=DH.firstNewWithText(select,'option','Search...');
-				first.value='..search..';
+				first.value=DEFAULT_SELECT_SEARCH_VALUE;
+				select.value=DEFAULT_SELECT_SEARCH_VALUE;
 				sdiv.appendChild(select);
-
+				let reset=DH.appendNewWithText(sdiv,'button','\u274C');
+				select.addEventListener('change',e=>this.eventChangeSearchSelect(e));
+				reset.addEventListener('click',e=>this.eventClickSearchCancel(e));
 		}
 	}
 
@@ -279,9 +320,9 @@ export class DataTable{
 					b=DH.appendNewWithText(th,'button',ti.prompt);
 					b.addEventListener('click',e=>this.eventCustomButton(e,ti.handler));
 					break;
-				case 'select':
+				case COLUMN_SELECT:
 					let span=DH.appendNewWithText(th,span,ti.prompt);
-					let s=DH.appendNew(span,'select');
+					let s=DH.appendNew(span,COLUMN_SELECT);
 					if('options' in ti){
 						ti.options.forEach(e=>{
 							let op=DH.appendNewWithText(s,'option',e.text);
@@ -402,7 +443,33 @@ export class DataTable{
 		}
 	}
 
+
+	//timeouts
+
+	timeoutTriggerSearch(){
+		this.setFilters();
+		this.waiting=false;
+	}
+
 	//events
+	eventInputSearch(e){
+		let n=e.target.parentNode.dataset.name;
+		if(e.target.value.length==0){
+			delete this.searches[n];
+			window.setTimeout(()=>this.timeoutTriggerSearch(),SEARCH_DELAY);
+			return;
+		}
+		if(!(n in this.searches)){
+			this.searches[n]={currentValue:e.target.value};
+		}
+		else{
+			this.searches[n].currentValue=e.target.value;
+		}
+		if(!this.waiting){
+			window.setTimeout(()=>this.timeoutTriggerSearch(),SEARCH_DELAY);
+			this.waiting=true;
+		}
+	}
 
 	eventCustomButton(e,handler){
 		handler(e);
@@ -441,6 +508,20 @@ export class DataTable{
 		}
 	}
 
+	eventChangeSearchSelect(e){
+		let n=e.target.parentNode.dataset.name;
+		if(n in this.searches&&e.target.value==DEFAULT_SELECT_SEARCH_VALUE){
+			delete this.searches[n];
+			this.timeoutTriggerSearch();
+			return;
+		}
+		if(!(n in this.searches)){
+			this.searches[n]={};
+		}
+		this.searches[n].currentValue=e.target.value;
+		this.setFilters();
+	}
+
 	async eventChangeSelect(e){
 		let td=e.target.parentNode;
 		let old=td.dataset.value;
@@ -448,17 +529,18 @@ export class DataTable{
 		try{
 			let r=await this.dataHandlers.change(td.dataset.id,
 				this.typer.getDataName(td.dataset.name),nv);
-			/*if(typeof r==='string'){
-				e.target.setCustomValidity(r);
-				e.target.focus();
-				return;
-			}*/
 		}
 		catch(err){
 			alert('Error: '+err);
 			e.target.value=old;
 			return;
 		}
+	}
+
+	eventClickSearchCancel(e){
+		e.target.parentNode.firstChild.value=DEFAULT_SELECT_SEARCH_VALUE;
+		delete this.searches[e.target.parentNode.dataset.name];
+		this.setFilters();
 	}
 
 	eventClickTitle(e){

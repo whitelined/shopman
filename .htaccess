@@ -1,0 +1,6 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine on
+	RewriteBase /
+	RewriteCond %{REQUEST_URI} !^/?(assets)
+	RewriteRule ^(.*)$ init.php [QSA,NC,L]
+</IfModule>

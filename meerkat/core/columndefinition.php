@@ -26,6 +26,7 @@ class ColumnDefinition{
 	public $parser=null;
 	public $filterable=false;
 	public $filterRestrictions=null;
+	public $dataTransformer=null;
 	public $selectable=false;
 	public $ordable=false;
 	public $updatable=false;
@@ -47,6 +48,7 @@ class ColumnDefinition{
 		$this->orderable=$orderable;
 		$this->updatable=$updatable;
 		$this->insertable=$insertable;
+		$this->dataTransformer=function($d){return $d;};
 	}
 
 	/**
@@ -75,25 +77,53 @@ class ColumnDefinition{
 	}
 
 	/**
-	 * Column is selectable
+	 * Make column selectable.
+	 *
+	 * @return ColumnDefinition
 	 */
 	public function Selectable():ColumnDefinition{
 		$this->selectable=true;
 		return $this;
 	}
 
+	/**
+	 * Make column orderable.
+	 *
+	 * @return ColumnDefinition
+	 */
 	public function Orderable():ColumnDefinition{
 		$this->ordable=true;
 		return $this;
 	}
 
+	/**
+	 * Make column updatable.
+	 *
+	 * @return ColumnDefinition
+	 */
 	public function Updatable():ColumnDefinition{
 		$this->updatable=true;
 		return $this;
 	}
 
+	/**
+	 * Make column insertable.
+	 *
+	 * @return ColumnDefinition
+	 */
 	public function Insertable():ColumnDefinition{
 		$this->insertable=true;
+		return $this;
+	}
+
+	/**
+	 * Adds a data transformer.
+	 *
+	 * @param callable $dataTransformer A callback, that accepts a data value, and returns data transformed to suit requirements.
+	 * @return ColumnDefinition
+	 */
+	public function AddDataTransformer(callable $dataTransformer):ColumnDefinition{
+		$this->dataTransformer=$dataTransformer;
 		return $this;
 	}
 }

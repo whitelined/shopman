@@ -18,7 +18,8 @@ export class CountriesTable{
 		this.table.attachDataHandler('refresh',()=>this.refreshData())
 			.attachDataHandler('sort',(n,d)=>this.setSort(n,d))
 			.attachDataHandler('view',(s,o)=>this.setView(s,o))
-			.attachDataHandler('change',(i,n,v)=>this.change(i,n,v));
+			.attachDataHandler('change',(i,n,v)=>this.change(i,n,v))
+			.attachDataHandler('filters',f=>this.setFilters(f));
 		this.table.addTextColumn(C.COUNTRIES_ID)
 			.addEditColumn(C.COUNTRIES_NAME)
 			.addEditColumn(C.COUNTRIES_CODE2)
@@ -33,8 +34,19 @@ export class CountriesTable{
 	}
 
 	async refreshData(){
-		let d=await this.cdi.get().columns('*').order(this.sort.name,this.sort.direction)
-			.limit(this.view.size,this.view.offset*this.view.size).send();
+		this.cdi.get().columns('*').order(this.sort.name,this.sort.direction)
+			.limit(this.view.size,this.view.offset*this.view.size);
+		for(const k in this.filters){
+			let value;
+			if(this.filters[k].comparison==C.SELECT_NULL_ID){
+				value=null;
+			}
+			else{
+				value=this.filters[k].comparison;
+			}
+			this.cdi.where(k,value,this.filters[k].operator);
+		}
+		let d=await this.cdi.send();
 		if(!d)
 			return;
 		this.table.clearBody();
@@ -59,6 +71,10 @@ export class CountriesTable{
 				return;
 			this.refreshData();
 		}
+	}
+
+	setFilters(filters){
+		this.filters=filters;
 	}
 
 	setSort(name,direction){

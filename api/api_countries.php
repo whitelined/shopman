@@ -12,10 +12,15 @@ class Api_Countries extends CDI{
 	public function __construct(Countries $country){
 		$this->country=$country;
 		$id=(new ColumnDefinition(Countries::id,true,true,false,false))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get','delete','update']);
-		$name=(new ColumnDefinition(Countries::name,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$c2=(new ColumnDefinition(Countries::code2,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$c3=(new ColumnDefinition(Countries::code3,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$r=(new ColumnDefinition(Countries::region,true,true,true,true))->Type(self::TYPE_INT)->Filterable(['='],['get']);
+		$name=(new ColumnDefinition(Countries::name,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['ILIKE','=','!='],['get']);
+		$c2=(new ColumnDefinition(Countries::code2,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['ILIKE','=','!='],['get']);
+		$c3=(new ColumnDefinition(Countries::code3,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['ILIKE','=','!='],['get']);
+		$r=(new ColumnDefinition(Countries::region,true,true,true,true))->Type(self::TYPE_INT)->Filterable(['='],['get'])->AddDataTransformer(
+			function($data){
+				if($data==-1)
+					return null;
+				return $data;
+			});
 		$this->AddColumnDefinition($id);
 		$this->AddColumnDefinition($name);
 		$this->AddColumnDefinition($c2);
