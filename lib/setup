@@ -1,0 +1,60 @@
+#!/usr/bin/php
+<?php
+
+function PromptYesNo(string $message):bool{
+	$h=fopen('php:://stdin','r');
+	$valid=false;
+	while(1){
+		echo "\n{$message} (Y/N): ";
+		$r=mb_strtolower(trim(fgets($h)));
+		if($r=='y'||$r='yes'){
+			return true;
+		}
+		else if($r=='n'||$r=='no'){
+			return false;
+		}
+		echo "\nInvalid response {$r}";
+	}
+}
+
+function CheckTable($name,$object){
+	echo "$name table\n";
+	if(!$object->DoesTableExist()){
+		echo "$name does not exist, creating\n";
+		$object->CreateTable();
+	}
+	else{
+		echo "$name exists, checking structures\n";
+		if($object->CheckTableContents())
+			echo "(OK)\n";
+		else
+			echo "(Error in structure)\n";
+	}
+}
+
+chdir('..');
+
+spl_autoload_register(function($class){
+	$in=mb_strtolower(str_replace('\\','/',$class));
+	if(!file_exists(Config\local_root.$in.'.php'))
+		var_dump(debug_backtrace());
+	require_once(Config\local_root.$in.'.php');
+});
+require_once('config/config.php');
+require_once('config/manifest.php');
+
+use Meerkat\Core\Manifest;
+
+$db=Manifest::GetManifestItem('MainDB');
+
+$regions=new Lib\Regions($db);
+CheckTable('Regions',$regions);
+
+$countries=new Lib\Countries($db);
+CheckTable('Countries',$countries);
+
+$pz=new Lib\PostalZones($db);
+CheckTable('Post Zones',$pz);
+
+$pzm=new Lib\PostalZoneMembers($db);
+CheckTable('Post Zone Members',$pzm);

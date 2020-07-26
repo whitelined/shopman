@@ -1,0 +1,244 @@
+body{
+	padding:0px;
+	margin:0px;
+	background-color:#FFFA9B;
+	font-family: 'Droid Sans', sans-serif;
+}
+
+.mainform_element{
+margin:10px 2px;
+}
+
+.mainform_element label,input,span{
+	display: block;
+}
+
+.mainform_element input{
+	box-sizing:border-box;
+	border: 1px solid;
+	border-color:#6422A0;
+}
+
+.mainform_input_error
+{
+	
+}
+
+article {
+	font-family: 'Oxygen', sans-serif;
+	color:#AF1A8A;
+	width:90%;
+	margin:0 auto;
+}
+
+
+@media (min-width:600px)
+{
+	.mainform_element label,input{
+		display:block;
+	}
+	.mainform_element label
+	{
+		float:left;
+		width:40%;
+	}
+	.mainform_element input
+	{
+		float:right;
+	}
+	.mainform_element span{
+		clear:right;
+	}
+	#top{
+		overflow:auto;
+		background-color:#261983;
+		margin:0px;
+		padding:0px;
+		width:100%;
+	}
+	
+	#navmenu{
+		height:150px;
+		margin:0px;
+		width:100%;
+		height:auto;
+		font-size:1em;
+		font-family:Lato;
+	}
+	
+	#menu
+	{
+		padding:0px 3px;
+		display:block;
+		list-style:none;
+		float:left;
+	}
+	#menu li
+	{
+		//background-color:rgba(238,228,35,0.2);
+		display:inline;
+	}
+	#menu a
+	{
+		color:#9B92DE;
+		text-decoration:none;
+		padding:3px;
+	}
+	#menu a:hover
+	{
+		background-color:#FFFA9B;
+		padding:3px;
+	}
+	
+	#menu img
+	{
+		display:none;
+	}
+	
+	#menulist
+	{
+		padding:0px 3px;
+	}
+
+	#langmenu{
+		width:55px;
+		float:right;
+		display: inline-block;
+		right:7px;
+	}
+	
+	#langmenu_pull{
+		display: none;
+		position: absolute;
+		background-color: #f9f9f9;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		padding: 2px 2px;
+	}
+	#langmenu_pull img{
+		display:block;
+	}
+	
+	#langmenu:hover #langmenu_pull
+	{
+		display:block;
+	}
+	#logo
+	{
+		clear:both;
+		background-image:url("http://vitacoll.co.uk/assets/images/header.png");
+		background-size: cover;
+		width:100%;
+		margin:0 auto;
+	}
+	#logoimg
+	{
+		margin:0 auto;
+		display:block;
+	}
+}
+
+@media (max-width:600px)
+{
+	#top{
+		overflow:auto;
+		background-color:#261983;
+		margin:0px;
+		padding:0px;
+		width:100%;
+	}
+	
+	#navmenu{
+		height:150px;
+		margin:0px;
+		width:100%;
+		height:auto;
+		font-size:1em;
+		font-family:Lato;
+	}
+	
+	#menu
+	{
+		display:block;
+		float:left;
+		padding:4px;
+	}
+	
+	#menu img{
+		display:block;
+	}
+	
+	#menulist
+	{
+		list-style:none;
+		display: none;
+		position: fixed;
+		top:0px;
+		left:0px;
+		background-color: #261983;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		padding: 10px 10px;
+	}
+
+	#menu:hover #menulist
+	{
+		display:block;
+	}
+
+	#menulist li
+	{
+		//background-color:rgba(238,228,35,0.2);
+		display:block;
+		padding:3px 4px;
+	}
+	#menulist a
+	{
+		color:#9B92DE;
+		text-decoration:none;
+		padding:3px;
+	}
+	#menulist a:hover
+	{
+		background-color:#FFFA9B;
+		padding:3px;
+	}
+	
+	#langmenu{
+		width:55px;
+		float:right;
+		display: inline-block;
+		right:7px;
+	}
+	
+	#langmenu_pull{
+		display: none;
+		position: absolute;
+		background-color: #f9f9f9;
+		box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		padding: 2px 2px;
+	}
+	#langmenu_pull img{
+		display:block;
+	}
+	
+	#langmenu:hover #langmenu_pull
+	{
+		display:block;
+	}
+	#logo
+	{
+		clear:both;
+		background-image: url("http://vitacoll.co.uk/assets/images/header.png");
+		background-size: cover;
+		width:100%;
+		margin:0 auto;
+	}
+	#logoimg
+	{
+		margin:0 auto;
+		display:block;
+	}
+	article
+	{
+		width:96%;
+	}
+}

@@ -1,0 +1,94 @@
+#!/usr/bin/php
+<?php
+
+function printCommand(){
+	echo "Usage:\n";
+	echo "randman -N3R1..45 -C24 -R1\n";
+	echo "-N is the number of random numbers, R is the range\n";
+	echo "-C optional, number of cycles to go through, set to R for random\n";
+	echo "-R optional, number of sets to generate\n";
+	echo "-V optional, verbose output\n";
+}
+
+function generateRow($sequences,$cycles,$verbose){
+	if($verbose){
+		echo "Cycles: $cycles\n";
+		$start=hrtime(true);
+	}
+	for($i=0;$i<$cycles;$i++){
+		$numbers=[];
+		foreach($sequences as $v){
+			$seq=[];
+			$rands=[];
+			for($j=$v['RangeFrom'];$j<($v['RangeTo']+1);$j++){
+				$seq[]=$j;
+			}
+			//var_dump($seq);
+			for($j=0;$j<$v['Amount'];$j++){
+				$n=mt_rand(0,(count($seq)-1));
+				$rands[]=$seq[$n];
+				array_splice($seq,$n,1);
+			}
+			$numbers[]=$rands;
+		}
+		$out=[];
+		foreach($numbers as $v){
+			$out[]=implode(',',$v);
+		}
+		if(($i+1)==$cycles)
+			echo implode('|',$out)."\n";
+	}
+	if($verbose){
+		$end=hrtime(true);
+		$total=$end-$start;
+		$rowTime=$total/$cycles/1000000;
+		$totalTime=$total/1000000;
+		echo "Average cycle time is {$rowTime}ms\n";
+		echo "Total time is {$totalTime}ms\n";
+	}
+}
+
+if($argc<2){
+	printCommand();exit;
+}
+$args=array_slice($argv,1);
+$cycleRandMax=449270;
+$cycleRandMin=1;
+
+$sequences=[];
+$cycles=1;
+$rows=1;
+$verbose=false;
+
+foreach($args as $v){
+	if(preg_match('/^-N([1-9][0-9]{0,10})(U?)R([0-9]{1,11})\.\.([1-9][0-9]{0,10})$/',
+		$v,$matches)){
+		$matches[1]=(int)$matches[1];
+		$matches[2]=($matches[2]=='U')?true:false;
+		$matches[3]=(int)$matches[3];
+		$matches[4]=(int)$matches[4];
+		$sequences[]=['Amount'=>$matches[1],'Unique'=>$matches[2],
+			'RangeFrom'=>$matches[3],'RangeTo'=>$matches[4]];
+	}
+	else if(preg_match('/^-C([1-9][0-9]{0,10}|R)$/',$v,$matches)){
+		$cycles=$matches[1];
+	}
+	else if(preg_match('/^-R([1-9][0-9]{0,10})$/',$v,$matches)){
+		$rows=$matches[1];
+	}
+
+	else if($v=='-V'){
+		$verbose=true;
+	}
+}
+
+if(count($sequences)<1){
+	printCommand();exit;
+}
+
+for($i=0;$i<$rows;$i++){
+	if($cycles=='R')
+		generateRow($sequences,mt_rand($cycleRandMin,$cycleRandMax),$verbose);
+	else
+		generateRow($sequences,$cycles,$verbose);
+}

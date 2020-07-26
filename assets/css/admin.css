@@ -1,0 +1,336 @@
+body{
+	padding:0px;
+	margin:0px;
+	background-color: rgb(200,210,80);
+	font-family: 'Droid Sans', sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+td{
+	vertical-align: top;
+}
+
+input:invalid{
+	background-color: red;
+}
+input:valid{
+	background-color: green;
+}
+
+.datatable{
+	background-color: azure;
+}
+
+.datatable.row1{
+	background-color: lightpink;
+}
+
+.datatable.row2{
+	background-color: lightgray;
+}
+
+.datatable.row1.selected{
+	background-color: darkorchid;
+	color: white;
+}
+
+.datatable.row2.selected{
+	background-color: darkorchid;
+	color: white;
+}
+
+.table_text_type{
+
+}
+
+.table_text_type_disabled{
+
+}
+
+.table_input_mask{
+position:fixed;
+top:0;
+bottom:0;
+left:0;
+right:0;
+z-index: 50;
+opacity: 0.9;
+background-color: white;
+}
+
+.table_input_mask + input{
+	position: relative;
+	z-index: 100;
+	background-color: blue;
+}
+
+.colsplit{
+height:12px;
+width:100%;
+background-color:white;
+background-image: url("http://www.vitacoll.co.uk/assets/images/splitterv.png");
+background-repeat: no-repeat;
+background-position: center;
+cursor: ns-resize;
+}
+.rowsplit{
+height:100%;
+width:12px;
+background-color:white;
+background-image: url("http://www.vitacoll.co.uk/assets/images/splitterh.png");
+background-repeat: no-repeat;
+background-position: center;
+cursor: ew-resize;
+}
+
+.top{
+overflow: auto;
+}
+
+.treeul{
+list-style: none;
+user-select: none;
+-moz-user-select: none;
+}
+
+.treeli{
+margin:3px;
+list-style-type: none;
+}
+
+.treeli span:first-of-type{
+user-select: none;
+font-weight: bold;
+cursor: pointer;
+}
+
+.folderselected{
+background-color: blue;
+color: white;
+}
+
+.fileselected{
+margin:3px;
+background-color: blue;
+color: green;
+}
+
+.loading{
+	z-index: 100;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(255,255,255,1);
+	cursor: wait;
+}
+
+.blankout {
+	top: 0px;
+	position: fixed;
+	opacity: 0;
+	z-index: -50;
+	display: flex;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(255,255,255,0.6);
+	justify-content: center;
+	align-items: center;
+}
+
+.blankout.show{
+	opacity: 50;
+	z-index: 50;
+}
+
+
+/* 
+Form elements
+*/
+
+.square {
+	padding: 15px;
+	background-color: rgb(232,123,4);
+	border: 1px solid;
+}
+
+.input-row-container{
+	margin: 5px;
+	display: flex;
+}
+
+.square label{
+	flex-basis: 40%;
+	text-align: right;
+	padding: 5px;
+}
+
+.input-container{
+}
+
+.error-span{
+	display: block;
+	position: absolute;
+	background-color: white;
+}
+
+
+.tabselected{
+	-moz-user-select: none;
+	background-color: #b3c3dd;
+	color: white;
+	flex-basis: auto;
+	padding: 5px;
+	border-radius: 8px 8px 0px 0px;
+}
+
+.tabnormal{
+	-moz-user-select: none;
+	background-color: #37588e;
+	color: white;
+	flex-basis: auto;
+	padding: 5px;
+	border-radius: 8px 8px 0px 0px;
+}
+
+
+.search-button{
+	position: relative;
+	display: inline-block;
+}
+
+.search-outline{
+	display: none;
+	position: absolute;
+	z-index: 5;
+	border-bottom: 1px black solid;
+	border-left: 1px black solid;
+	border-right: 1px black solid;
+	padding: 10px 5px 5px 5px;
+	margin: 0px;
+	color: blue;
+	background-color: white;
+}
+
+.search-button:hover .search-outline{
+	display: block;
+}
+
+.dropbtn {
+    /*padding: 16px;*/
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown {
+    display: block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #3e0041;
+}
+
+input:disabled {
+	background: #b5b1e0;
+	color: #d60000;
+}
+
+#category_props{
+
+}
+
+#category_items{
+	display:none;
+}
+
+#rightpane{
+	overflow: auto;
+	background-color: #b3c3dd;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+#content{
+	background-color: #b3c3dd;
+}
+
+#tabs{
+	background-color: #2696ff;
+	display: flex;
+	flex-direction: row;
+	width: auto;
+	padding: 7px 7px 0px 7px;
+	box-sizing: border-box;
+}
+
+#treepane{
+	width:100%;
+	display:flex;
+	flex-direction: column;
+}
+
+#treemenubuttonbar{
+border:3px solid;
+padding:10px;
+width:auto;
+display:flex;
+flex-direction: row;
+justify-content: center;
+box-sizing: border-box;
+}
+
+#treemenubuttonbar button{
+display:block;
+flex-base:auto;
+}
+
+#treecontroller{
+width: 100%;
+flex-base:auto;
+overflow: auto;
+}
+
+#split1{
+top: 30px;
+padding:0px;
+border:0px;
+width:100%;
+bottom: 0px;
+position: absolute;
+}
+
+#navbar{
+height: 30px;
+display: flex;
+flex-direction: row;
+width:100%;
+}
