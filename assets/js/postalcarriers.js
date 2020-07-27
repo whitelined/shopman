@@ -86,6 +86,8 @@ export class PostalCarriersTable extends DataTableController{
 			return;
 		this.table.clearBody();
 		d.data.forEach(r => {
+			if(r[C.POSTAL_ZONE_NAME]==null)
+				r[C.POSTAL_ZONE_NAME]='{NOT SET}';
 			this.table.addRow(r[C.POSTAL_CARRIER_ID],r);
 		});
 		this.table.renderFoot(d.totalSize);
