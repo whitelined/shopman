@@ -1,4 +1,5 @@
 import {DH} from './dh.js';
+import * as T from './typer.js';
 const DEFAULT_SELECT_SEARCH_VALUE='..search..';
 const SEARCH_DELAY=300;
 
@@ -6,9 +7,17 @@ export const COLUMN_TEXT='text';
 export const COLUMN_EDIT='edit';
 export const COLUMN_SELECT='select';
 export const COLUMN_CHECK='check';
+export const COLUMN_LINK='link';
 
 export class DataTable{
-	constructor(typer,elements,classes={}){
+	/**
+	 * 
+	 * @param {Typer} typer 
+	 * @param {Object} elements 
+	 * @param {Object} classes 
+	 */
+	constructor(controller,typer,elements,classes={}){
+		this.controller=controller;
 		this.typer=typer;
 		this.elements=elements;
 		this.columns=[];
@@ -20,7 +29,6 @@ export class DataTable{
 		this.previousRow=2;
 		this.selectedRows=[];
 		this.toolbarItems=[];
-		this.dataHandlers={};
 		this.searches={};
 		this.waiting=false;
 
@@ -62,14 +70,14 @@ export class DataTable{
 	setSort(name,direction){
 		this.currentSort=name;
 		this.currentDirection=direction;
-		this.dataHandlers.sort(name,direction);
+		this.controller.setSort(name,direction);
 		this.renderHead();
-		this.dataHandlers.refresh();
+		this.controller.refresh();
 	}
 
 	setViewSize(size){
 		this.viewSize=size;
-		this.dataHandlers.view(this.viewSize,this.viewOffset);
+		this.controller.setView(this.viewSize,this.viewOffset);
 	}
 
 	setFilters(){
@@ -94,8 +102,8 @@ export class DataTable{
 					break;
 			}
 		}
-		this.dataHandlers.filters(filters);
-		this.dataHandlers.refresh();
+		this.controller.setFilters(filters);
+		this.controller.refresh();
 	}
 
 	/**
@@ -114,63 +122,88 @@ export class DataTable{
 	}
 
 	/**
-	 * Attaches handler to handle callbacks for specified action.
-	 * @param {string} action Action to attach handler to. view/change/refresh
-	 * @param {function} handler 
-	 */
-	attachDataHandler(action,handler){
-		this.dataHandlers[action]=handler;
-		return this;
-	}
-
-	/**
-	 * 
+	 * Adds a item to the toolbar.
 	 * @param {string} type 
 	 * @param {string} prompt 
 	 * @param {string} name 
-	 * @param {callback} handler 
 	 */
-	addToolbarItem(type,prompt,name=null,handler){
+	addToolbarItem(type,prompt,name=null){
 		this.toolbarItems.push({
 			type:type,
 			prompt:prompt,
-			name:name,
-			handler:handler});
+			name:name});
 		return this;
 	}
 
 	//Add Column types
 
-
-	addTextColumn(name,sortable=true,searchable=true){
-		if(!this.typer.typeExists(name))
+	/**
+	 * 
+	 * @param {string} name Name of column, to be found in supplied Typer.
+	 * @param {boolean} sortable Is column sortable.
+	 * @param {boolean} searchable Is column searchable.
+	 */
+	addColumn(name,sortable=true,searchable=true){
+		if(!this.typer.typeExists(name)){
 			throw 'Typer does not contain "'+name+'"';
+		}
+		if(this.findColumn(name))
+			throw 'Column "'+name+'" already exists';
+		let t=this.typer.getType(name);
+		switch(t){
+			case T.TYPE_INT:
+			case T.TYPE_REGEX:
+			case T.TYPE_STRING:
+				if(this.typer.isReadOnly(name)){
+					this.addTextColumn(name,t,sortable,searchable);
+				}
+				else{
+					this.addEditColumn(name,t,sortable,searchable);
+				}
+				break;
+			case T.TYPE_LIST:
+				this.addSelectColumn(name,t,sortable,searchable);
+				break;
+		}
+		return this;
+	}
+	
+	addLinkColumn(name){
 		if(this.findColumn(name))
 			throw 'Column "'+name+'" already exists';
 		this.columns.push({
 			name:name,
-			sortable:sortable,
-			searchable:searchable,
-			type:COLUMN_TEXT
+			sortable:false,
+			searchable:false,
+			type:COLUMN_LINK,
+			dataType:null
 		});
 		return this;
 	}
 
-	addEditColumn(name,sortable=true,searchable=true){
-		if(!this.typer.typeExists(name))
-			throw 'Typer does not contain "'+name+'"';
-		if(this.findColumn(name))
-			throw 'Column "'+name+'" already exists';
+	addTextColumn(name,dataType,sortable=true,searchable=true){
 		this.columns.push({
 			name:name,
 			sortable:sortable,
 			searchable:searchable,
-			type:COLUMN_EDIT
+			type:COLUMN_TEXT,
+			dataType:dataType
 		});
 		return this;
 	}
 
-	addSelectColumn(name,sortable=true,searchable=true){
+	addEditColumn(name,dataType,sortable=true,searchable=true){
+		this.columns.push({
+			name:name,
+			sortable:sortable,
+			searchable:searchable,
+			type:COLUMN_EDIT,
+			dataType:dataType
+		});
+		return this;
+	}
+
+	addSelectColumn(name,dataType,sortable=true,searchable=true){
 		if(!this.typer.typeExists(name))
 			throw 'Typer does not contain "'+name+'"';
 		if(this.findColumn(name))
@@ -179,7 +212,8 @@ export class DataTable{
 			name:name,
 			sortable:sortable,
 			type:COLUMN_SELECT,
-			searchable:searchable
+			searchable:searchable,
+			dataType:dataType
 		});
 		return this;
 	}
@@ -234,6 +268,9 @@ export class DataTable{
 					break;
 				case COLUMN_SELECT:
 					this.renderSelect(td,c.name,data[dataName]);
+					break;
+				case COLUMN_LINK:
+					this.renderLink(td,data[c.name]);
 					break;
 			}
 		});
@@ -314,11 +351,12 @@ export class DataTable{
 					break;
 				case 'delete':
 					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.addEventListener('click',e=>this.eventDelete(e,ti.handler));
+					b.addEventListener('click',e=>this.eventDelete(e));
 					break;
 				case 'custom':
 					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.addEventListener('click',e=>this.eventCustomButton(e,ti.handler));
+					b.dataset.name=ti.name;
+					b.addEventListener('click',e=>this.eventCustomButton(e));
 					break;
 				case COLUMN_SELECT:
 					let span=DH.appendNewWithText(th,span,ti.prompt);
@@ -360,6 +398,11 @@ export class DataTable{
 
 	clearBody(){
 		DH.clearChildNodes(this.elements.tbody);
+	}
+
+	renderLink(td,value){
+		let a=DH.appendNewWithText(td,a,value);
+		a.addEventListener('click',e=>{this.eventClickLink(e)});
 	}
 
 	renderText(td,value){
@@ -452,6 +495,13 @@ export class DataTable{
 	}
 
 	//events
+
+	eventClickLink(e,handler){
+		e.preventDefault();
+		let d=e.target.parentNode.dataset;
+		this.controller.clickLink(d.name,d.id,d.value);
+	}
+
 	eventInputSearch(e){
 		let n=e.target.parentNode.dataset.name;
 		if(e.target.value.length==0){
@@ -471,16 +521,17 @@ export class DataTable{
 		}
 	}
 
-	eventCustomButton(e,handler){
-		handler(e);
+
+	eventCustomButton(e){
+		this.controller.clickCustomButton(e.target.dataset.name);
 	}
 
 	eventToolbarSelectChange(e,handler){
 		handler(e.target.value);
 	}
 
-	eventDelete(e,handler){
-		handler(this.selectedRows);
+	eventDelete(e){
+		this.controller.delete(this.selectedRows);
 	}
 
 	eventSelectNone(e){
@@ -527,7 +578,7 @@ export class DataTable{
 		let old=td.dataset.value;
 		let nv=e.target.value;
 		try{
-			let r=await this.dataHandlers.change(td.dataset.id,
+			let r=await this.controller.change(td.dataset.id,
 				this.typer.getDataName(td.dataset.name),nv);
 		}
 		catch(err){
@@ -559,8 +610,8 @@ export class DataTable{
 	eventClickPage(e){
 		e.preventDefault();
 		this.viewOffset=parseInt(e.target.dataset.viewOffset);
-		this.dataHandlers.view(this.viewSize,this.viewOffset);
-		this.dataHandlers.refresh();
+		this.controller.view(this.viewSize,this.viewOffset);
+		this.controller.refresh();
 	}
 
 	eventDoubleClickText(e){
@@ -581,7 +632,7 @@ export class DataTable{
 		let td=e.target.parentNode;
 		let nv=e.target.value;
 		try{
-			let r=await this.dataHandlers.change(td.dataset.id,
+			let r=await this.controller.change(td.dataset.id,
 				this.typer.getDataName(td.dataset.name),nv);
 			if(typeof r==='string'){
 				e.target.setCustomValidity(r);
@@ -623,3 +674,43 @@ export class DataTable{
 	}
 }
 
+export class DataTableController{
+	constructor(){
+		this.view={};
+		this.sort={};
+	}
+
+	async refresh(){
+		alert('not implemented');
+	}
+
+	async change(rowId,name,value){
+		alert('change not implemented');
+	}
+
+	async delete(ids){
+		alert('delete not implemented');
+	}
+
+	clickCustomButton(name){
+		alert('clickCustomButton not implemented');
+	}
+
+	clickLink(name,id,value){
+		alert('clickLink not implemented');
+	}
+
+	setFilters(filters){
+		this.filters=filters;
+	}
+
+	setSort(name,direction){
+		this.sort.name=name;
+		this.sort.direction=direction;
+	}
+
+	setView(size,offset){
+		this.view.size=size;
+		this.view.offset=offset;
+	}
+}

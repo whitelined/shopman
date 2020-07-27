@@ -64,7 +64,7 @@ export class CommonDataInterface{
 			if(this.currentQuery.columns.find(e=>k==e)===undefined)
 				remove.push(k);
 		}
-		remove.forEach(e=>{delete v[k]});
+		remove.forEach(e=>{delete v[e]});
 		this.currentQuery.values.push(v);
 		return this;
 	}

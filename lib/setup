@@ -53,8 +53,11 @@ CheckTable('Regions',$regions);
 $countries=new Lib\Countries($db);
 CheckTable('Countries',$countries);
 
+$pc=new Lib\PostalCarriers($db);
+CheckTable('Postal Carriers',$pc);
+
 $pz=new Lib\PostalZones($db);
 CheckTable('Post Zones',$pz);
 
-$pzm=new Lib\PostalZoneMembers($db);
-CheckTable('Post Zone Members',$pzm);
+//$pzm=new Lib\PostalZoneMembers($db);
+//CheckTable('Post Zone Members',$pzm);

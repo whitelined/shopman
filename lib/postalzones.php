@@ -2,61 +2,33 @@
 
 namespace Lib;
 
-use \Meerkat\Core\CommonDataInterface as CDI;
-
-class PostalZones{
-	use TypicalDataInterface;
+class PostalZones extends TypicalDataInterface{
 	public const schema='shopman';
 	public const table='postal_zones';
-	public const id='postal_zone_id';
-	public const name='postal_zone_name';
+	public const id='postal_zones_id';
+	public const name='postal_zones_name';
 	public const description='description';
-	
-	private $db;
-	private $pdoh;
-	private $sql;
-	private $columns=[self::id=>'integer',self::name=>'text',self::description=>'text'];
 
 	public function __construct(\PDO $db){
-		$this->db=$db;
-		$this->pdoh=new \Meerkat\Core\PDOHelper($db);
-		$this->sql=new \Meerkat\Core\PDOString($db,$this->columns,self::table,self::schema);
+		$this->Init($db,[
+				self::id=>'integer',
+				PostalZones::id=>'integer',
+				self::name=>'text',
+				self::description=>'text'],
+			self::id,self::table,self::schema);
 	}
 
 	public function CreateTable(){
 		$this->sql->StartCreateTable()
-			->AddColumn(self::id,'serial')
-			->AddColumn(self::name,'text')
-			->AddColumn(self::description,'text')
+			->CreateColumn(self::id,'serial')
+			->CreateColumn(PostalCarriers::id,'int')
+			->AppendForeignKey(PostalCarriers::id,PostalCarriers::table,PostalCarriers::schema)
+			->CreateColumn(self::name,'text')
+			->CreateColumn(self::description,'text')
 			->AddUniqueConstraint(self::name)
 			->AddPrimaryKey(self::id)
 			->EndTable()
 			->GetStatement()
 			->execute();
-	}
-
-	public function Update(array $set,array $where):int{
-		$st=$this->sql->Start()
-			->Update()
-			->Set($set)
-			->Where(self::id,$where)
-			->Limit(1)
-			->GetStatement();
-		$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
-		if($rowCount!=1)
-			return CDI::QUERY_UPDATE_NOTHING_CHANGED;
-		return CDI::QUERY_OK;
-	}
-
-	public function Delete(array $where):int{
-		$st=$this->sql->Start()
-			->Delete()
-			->Where(self::id,$where)
-			->Limit(1)
-			->GetStatement();
-			$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
-		if($rowCount!=1)
-			return CDI::QUERY_UPDATE_NOTHING_CHANGED;
-		return CDI::QUERY_OK;
 	}
 }

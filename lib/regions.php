@@ -16,8 +16,8 @@ class Regions extends TypicalDataInterface{
 
 	public function CreateTable(){
 		$this->sql->StartCreateTable(self::table,self::schema)
-			->AddColumn(self::id,'serial')
-			->AddColumn(self::name,'text')
+			->CreateColumn(self::id,'serial')
+			->CreateColumn(self::name,'text')
 			->AddPrimaryKey(self::id)
 			->AddUniqueConstraint(self::name)
 			->EndTable()

@@ -25,9 +25,9 @@ class Postage{
 
 	public function CreateTable(){
 		$this->sql->StartCreateTable()
-			->AddColumn(self::id,'serial')
-			->AddColumn(self::name,'text')
-			->AddColumn(self::description,'text')
+			->CreateColumn(self::id,'serial')
+			->CreateColumn(self::name,'text')
+			->CreateColumn(self::description,'text')
 			->AddUniqueConstraint(self::name)
 			->AddPrimaryKey(self::id)
 			->EndTable()

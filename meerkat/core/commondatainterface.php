@@ -294,13 +294,13 @@ abstract class CommonDataInterface{
 					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
 						"Value '{$k2}' not defined in column.");
 				}
-				$value=($this->definitions[$k2]->dataTransformer)($v[$k2]);
+				$v[$k2]=($this->definitions[$k2]->dataTransformer)($v[$k2]);
 				if(!$this->CheckType($k2,$value)){
 					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
 					"Value for '{$k2}' not valid.");
 				}
 			}
-			$rows[]=$value;
+			$rows[]=$v;
 		}
 		$this->values=$rows;
 	}

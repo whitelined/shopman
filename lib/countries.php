@@ -38,11 +38,11 @@ class Countries extends TypicalDataInterface{
 
 	public function CreateTable(){
 		$this->sql->StartCreateTable()
-			->AddColumn(self::id,'serial')
-			->AddColumn(self::name,'text')
-			->AddColumn(self::code2,'text')
-			->AddColumn(self::code3,'text')
-			->AddColumn(self::region,'integer')
+			->CreateColumn(self::id,'serial')
+			->CreateColumn(self::name,'text')
+			->CreateColumn(self::code2,'text')
+			->CreateColumn(self::code3,'text')
+			->CreateColumn(self::region,'integer')
 			->AppendForeignKey(Regions::id,Regions::table,Regions::schema)
 			->AddPrimaryKey(self::id)
 			->AddUniqueConstraint(self::name)

@@ -1,8 +1,7 @@
 import * as C from './constants.js';
 import {Typer} from './typer.js';
 import {CommonDataInterface as CDI} from './commondatainterface.js';
-import {CountriesTable} from './countriestable.js';
-import {CountriesForm} from './countriesform.js'
+import {CountriesTable,CountriesForm} from './countries.js';
 
 const REGION_ID_FORM=C.REGION_ID+'_form';
 const REGION_ID_TABLE=C.REGION_ID+'_table';
@@ -50,12 +49,12 @@ class AdminCountries{
 	async start(){
 		this.regions=await this.getRegions();
 		this.typer=new Typer();
-		this.typer.addInteger(C.COUNTRIES_ID,false,'0','Country ID')
-			.addString(C.COUNTRIES_NAME,false,'-','Country Name','Country name needs to be 2-100 characters.')
-			.addRegex(C.COUNTRIES_CODE2,false,'-','ISO Code 2',/^[A-Z]{2}$/,'Two characters, [A-Z].')
-			.addRegex(C.COUNTRIES_CODE3,false,'-','ISO Code 3',/^[A-Z]{3}$/,'Three characters, [A-Z].')
-			.addList(REGION_ID_FORM,C.REGION_ID,C.SELECT_DEFAULT_TEXT,'Region','Select region from list.')
-			.addList(REGION_ID_TABLE,C.REGION_ID,C.SELECT_NULL_ID,'Region','Select region from list.');
+		this.typer.addInteger(C.COUNTRIES_ID,false,'0','Country ID',true,null,0)
+			.addString(C.COUNTRIES_NAME,false,'-','Country Name',false,'Country name needs to be 2-100 characters.')
+			.addRegex(C.COUNTRIES_CODE2,false,'-','ISO Code 2',false,/^[A-Z]{2}$/,'Two characters, [A-Z].')
+			.addRegex(C.COUNTRIES_CODE3,false,'-','ISO Code 3',false,/^[A-Z]{3}$/,'Three characters, [A-Z].')
+			.addList(REGION_ID_FORM,C.REGION_ID,C.SELECT_DEFAULT_TEXT,'Region','Select region from list.',false)
+			.addList(REGION_ID_TABLE,C.REGION_ID,C.SELECT_NULL_ID,'Region','Select region from list.',false);
 		this.setTyperRegions(this.regions);
 		this.table=new CountriesTable(this.typer,REGION_ID_TABLE,
 			this.ccdi,this.tableElements,()=>this.showNewCountryForm());

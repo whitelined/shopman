@@ -21,9 +21,9 @@ class PostalZoneMembers{
 
 	public function CreateTable(){
 		$this->sql->StartCreateTable()
-			->AddColumn(PostalZones::id,'integer')
+			->CreateColumn(PostalZones::id,'integer')
 			->AppendForeignKey(PostalZones::id,PostalZones::table,PostalZones::schema)
-			->AddColumn(Countries::id,'integer')
+			->CreateColumn(Countries::id,'integer')
 			->AppendForeignKey(Countries::id,Countries::table,countries::schema)
 			->AddUniqueConstraint([PostalZones::id,Countries::id])
 			->EndTable()

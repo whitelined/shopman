@@ -8,6 +8,9 @@ $webapp->Get('Index',function(){ $obj=new Objects\Index(); });
 $webapp->Get('Admin/Countries',function(){
 	$o=new Objects\Admin_Countries();
 });
+$webapp->Get('Admin/PostalCarriers',function(){
+	$o=new Objects\Admin_PostalCarriers();
+});
 $webapp->Get('Admin/Regions',function(){
 	$o=new Objects\Admin_Regions();
 });
@@ -20,6 +23,13 @@ $webapp->Post('api/Countries',function(){
 		M::GetManifestItem('MainDB'));
 	$o=new API\Api_Countries($c);
 });
+
+$webapp->Post('api/PostalCarriers',function(){
+	$c=new Lib\PostalCarriers(
+		M::GetManifestItem('MainDB'));
+	$o=new API\Api_PostalCarriers($c);
+});
+
 
 $webapp->Post('api/Regions',function(){
 	$c=new Lib\Regions(

@@ -25,9 +25,12 @@ class PDOString{
 	private $bindingReferences;
 	private $definitions;
 	private $columnOrder;
+	private $columns;
 	private $newColumns;
 	private $defaultTable;
 	private $defaultSchema;
+	private $stores;
+	private $nextWhere;
 
 	/**
 	 * Constructor
@@ -44,21 +47,18 @@ class PDOString{
 		$this->Reset();
 	}
 
-	private function Append($text){
+	private function Append($text,$addSpace=true){
 		trim($text);
+		if(!$addSpace){
+			$this->sql.=$text;
+			return;
+		}
 		if($this->sql==''){
 			$this->sql=$text;
 		}
 		else{
 			$this->sql.=' '.$text;
 		}
-	}
-
-	private function FormatOperator($operator){
-		if($operator=='LIKE'||$operator=='NOT LIKE'||$operator=='ILIKE'||$operator=='NOT ILIKE'){
-			return " {$operator} ";
-		}
-		return $operator;
 	}
 
 	private function NextBindingParameter($action,$type=''):string{
@@ -97,9 +97,23 @@ class PDOString{
 		}
 	}
 
-	private function FormatWhereClause(string $name,array $where):string{
+	private function FormatColumn($name,$alias){
+		if($alias=='')
+			return $name;
+		return "{$alias}.{$name}";
+	}
+
+	private function FormatOperator($operator){
+		if($operator=='LIKE'||$operator=='NOT LIKE'||$operator=='ILIKE'||$operator=='NOT ILIKE'){
+			return " {$operator} ";
+		}
+		return $operator;
+	}
+
+	private function FormatWhereClause(string $name,string $alias, array $where):string{
+		$n=$this->FormatColumn($name,$alias);
 		if($where['comparison']===null){
-			return "{$name} IS NULL";
+			return "{$n} IS NULL";
 		}
 		if(!isset($where['operator'])){
 			$o=$this->DefaultOperator($name);
@@ -113,10 +127,10 @@ class PDOString{
 				foreach($where['comparison'] as $v){
 					$comps[]=$this->PrepareBindValue($name,$v,'w');
 				}
-				return "$name IN (".implode(',',$comps).')';
+				return "$n IN (".implode(',',$comps).')';
 			}
 			else{
-				return "$name IN (".$this->PrepareBindValue($name,$where['comparison'],'w').')';
+				return "$n IN (".$this->PrepareBindValue($name,$where['comparison'],'w').')';
 			}
 		}
 		return $name.$this->FormatOperator($o)
@@ -126,12 +140,13 @@ class PDOString{
 	/**
 	 * Formats SQL identifer, adds schema if not null
 	 *
-	 * @param [type] $name Identifier
-	 * @param [type] $schema Schema
-	 * @return string
+	 * @param string $name Identifier
+	 * @param string $schema Schema
+	 * @param string $alias Alias of identifier
+	 * @return string Returns formatted identifier
 	 */
-	private function FormatIdentifier($name,$schema):string{
-		if(!$schema){
+	public function FormatIdentifier(string $name='',string $schema='',string $alias=''):string{
+		if($schema==''){
 			if($this->defaultSchema){
 				$s=$this->defaultSchema.'.';
 			}
@@ -142,7 +157,11 @@ class PDOString{
 		else{
 			$s=$schema.'.';
 		}
-		return $s.((!$name)?$this->defaultTable:$name);
+		$a='';
+		if($alias!=''){
+			$a=" {$alias}";
+		}
+		return $s.(($name=='')?$this->defaultTable:$name).$a;
 	}
 
 	/**
@@ -154,9 +173,10 @@ class PDOString{
 		$this->sql='';
 		$this->bindingValues=[];
 		$this->bindingReferences=[];
-		$this->bindingNextParameter=1;
 		$this->newColumns=[];
 		$this->columnOrder=[];
+		$this->stores=[];
+		$this->columns=[];
 		return $this;
 	}
 
@@ -174,6 +194,33 @@ class PDOString{
 	}
 
 	/**
+	 * Stores currently generated SQL for later use, resets current SQL string - not binding values though!
+	 *
+	 * @param [type] $name Name to get item.
+	 * @return PDOString
+	 */
+	public function Push($name):PDOString{
+		$this->stores[$name]=$this->sql;
+		$this->sql='';
+		return $this;
+	}
+
+	/**
+	 * Retrieves named SQL stored, and deletes it specified.
+	 *
+	 * @param [type] $name Nane of item to get.
+	 * @param boolean $keep Set to true if you don't want to delete item.
+	 * @return string Stored SQL statement.
+	 */
+	public function Pop($name,$keep=false):string{
+		$s=$this->stores[$name];
+		if($keep)
+			return $s;
+		unset($this->stores[$name]);
+		return $s;
+	}
+
+	/**
 	 * Appends SELECT statement, optionally lists columns after
 	 *
 	 * @param array $columns
@@ -187,13 +234,33 @@ class PDOString{
 	}
 
 	/**
+	 * Starts sub statement
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function StartSub():PDOString{
+		$this->Append('(',false);
+		return $this;
+	}
+
+	/**
+	 * Ends sub statement
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function EndSub():PDOString{
+		$this->Append(')',false);
+		return $this;
+	}
+
+	/**
 	 * Appends UPDATE statement to table
 	 *
 	 * @param string $table Table to update.
 	 * @param string $schema Schema.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Update(string $table=null,string $schema=null):PDOString{
+	public function Update(string $table='',string $schema=''):PDOString{
 		$this->Append("UPDATE ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -205,7 +272,7 @@ class PDOString{
 	 * @param string $schema Schema.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Insert(string $table=null,string $schema=null):PDOString{
+	public function Insert(string $table='',string $schema=''):PDOString{
 		$this->Append("INSERT INTO ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -217,7 +284,7 @@ class PDOString{
 	 * @param string $schema Schema.s
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Delete(string $table=null,string $schema=null):PDOString{
+	public function Delete(string $table='',string $schema=''):PDOString{
 		$this->Append("DELETE FROM ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -228,8 +295,8 @@ class PDOString{
 	 * @param [type] $table Table from.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function From($table=null,$schema=null):PDOString{
-		$this->Append('FROM '.$this->FormatIdentifier($table,$schema));
+	public function From(string $table='',string $schema='',string $alias=''):PDOString{
+		$this->Append('FROM '.$this->FormatIdentifier($table,$schema,$alias));
 		return $this;
 	}
 
@@ -260,6 +327,47 @@ class PDOString{
 	}
 
 	/**
+	 * Starts list of columns.
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function StartColumns():PDOString{
+		$this->columns=[];
+		return $this;
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @param string $name
+	 * @param string $from
+	 * @param string $as
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function AddColumn(string $name, string $from=null, string $as=null):PDOString{
+		$c='';
+		if($from){
+			$c.="{$from}.";
+		}
+		$c.=$name;
+		if($as){
+			$c.=" as {$as}";
+		}
+		$this->columns[]=$c;
+		return $this;
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function EndColumns():PDOString{
+		$this->Append(implode(',',$this->columns));
+		return $this;
+	}
+
+	/**
 	 * Appends list of columns
 	 *
 	 * @param array $columns Can be a string of one column name or *, or an array of names;
@@ -267,6 +375,27 @@ class PDOString{
 	 */
 	public function Columns(array $columns):PDOString{
 		$this->Append(implode(',',$columns));
+		return $this;
+	}
+
+	/**
+	 * Appends column to last column definition.
+	 *
+	 * @param string $name Name of column.
+	 * @param string $from table or alias where column is from.
+	 * @param string $as column is returned as this.
+	 * @return PDOString
+	 */
+	public function AppendColumn(string $name, string $from='', string $as=''):PDOString{
+		$c='';
+		if($from!=''){
+			$c.="{$from}.";
+		}
+		$c.=$name;
+		if($as!=''){
+			$c.=" as {$as}";
+		}
+		$this->Append(",$c",false);
 		return $this;
 	}
 
@@ -301,17 +430,37 @@ class PDOString{
 		return $this;
 	}
 
+
+	public function CompareValue($comparison):PDOString{
+		$this->Append($this->FormatWhereClause($this->nextWhere[0],$this->nextWhere[1],$comparison));
+		return $this;
+	}
+
+	/**
+	 * Comparison against column
+	 *
+	 * @param string $name Name of column.
+	 * @param string $alias Optional table alias.
+	 * @param string $operator Operator, the default is '='.
+	 * @return PDOString
+	 */
+	public function CompareColumn(string $name,string $alias='',string $operator='='):PDOString{
+		$this->Append($this->FormatColumn($this->nextWhere[0],$this->nextWhere[1])
+			.$this->FormatOperator($operator)
+			.$this->FormatColumn($name,$alias));
+		return $this;
+	}
+
 	/**
 	 * Appends string of a comparison filter
 	 *
 	 * @param string $name Name of Column to filter.
-	 * @param array $where Array containing 'comparison' and optional 'operator'.
-	 * @param boolean $prefix
+	 * @param string $alias Optional table alias.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Where(string $name,array $where):PDOString{
-
-		$this->Append('WHERE '.$this->FormatWhereClause($name,$where));
+	public function Where(string $name,string $alias=''):PDOString{		
+		$this->nextWhere=[$name,$alias];
+		$this->Append("WHERE");
 		return $this;
 	}
 
@@ -325,7 +474,7 @@ class PDOString{
 	public function WhereAnd(array $where):PDOString{
 		$filters=[];
 		foreach($where as $k=>$v){
-			$filters[]=$this->FormatWhereClause($k,$v);
+			$filters[]=$this->FormatWhereClause($k,'',$v);
 		}
 		if(count($filters)<1)
 			return $this;
@@ -343,8 +492,7 @@ class PDOString{
 	public function WhereOr(array $where):PDOString{
 		$filters=[];
 		foreach($where as $k=>$v){
-
-			$filters[]=$this->FormatWhereClause($k,$v);
+			$filters[]=$this->FormatWhereClause($k,'',$v);
 		}
 		if(count($filters)<1)
 			return $this;
@@ -394,7 +542,7 @@ class PDOString{
 	 * @param boolean $ifNotExists Add 'IF NOT EXISTS' to suppress warning of table already existing.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function StartCreateTable(string $table=null,string $schema=null,bool $ifNotExists=true):PDOString{
+	public function StartCreateTable(string $table='',string $schema='',bool $ifNotExists=true):PDOString{
 		$this->newColumns=[];
 		$this->Append('CREATE TABLE');
 		if($ifNotExists)
@@ -404,13 +552,13 @@ class PDOString{
 	}
 
 	/**
-	 * Adds new column of type
+	 * Creates new column of type for new table.
 	 *
 	 * @param string $name Name of column.
 	 * @param string $type Type of column.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function AddColumn(string $name,string $type):PDOString{
+	public function CreateColumn(string $name,string $type):PDOString{
 		$this->newColumns[]="$name $type";
 		return $this;
 	}

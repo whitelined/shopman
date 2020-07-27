@@ -42,6 +42,16 @@ abstract class TypicalDataInterface{
 		return $st->fetch(\PDO::FETCH_ASSOC)['count'];
 	}
 
+	public function CountWhere(array $where):int{
+		$st=$this->sql->Start()
+			->Select(['COUNT(*) as count'])
+			->From()
+			->WhereAnd($where)
+			->GetStatement();
+		$st->execute();
+		return $st->fetch(\PDO::FETCH_ASSOC)['count'];
+	}
+
 	public function Insert(array $columns,array $values){
 		$rowCount=0;
 		$st=$this->sql->Start()
