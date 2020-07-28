@@ -65,7 +65,7 @@ class Admin_Regions{
 			.attachDataHandler('view',(s,o)=>this.setView(s,o))
 			.attachDataHandler('change',(i,n,v)=>this.change(i,n,v));
 		this.table.addTextColumn(ID,true).addEditColumn(NAME,true)
-			.addToolbarItem('custom','\u229E','create',e=>this.form.showForm())
+			.addToolbarItem('custom',C.UI_CREATE_GLYPH,'create',e=>this.form.showForm())
 			.addToolbarItem('selectAll','\u2611')
 			.addToolbarItem('selectNone','\u2610')
 			.addToolbarItem('delete',String.fromCodePoint(0x1F5D1),'delete',ids=>{this.deleteRegions(ids)});
@@ -111,7 +111,7 @@ class Admin_Regions{
 				.where(ID,ids,'IN').send();
 			if(!d)
 				return;
-			this.refreshData();
+			this.refresh();
 		}
 	}
 

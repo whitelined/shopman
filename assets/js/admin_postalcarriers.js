@@ -1,7 +1,7 @@
 import * as C from './constants.js';
 import {CommonDataInterface as CDI, CommonDataInterface} from './commondatainterface.js';
 import {Typer} from './typer.js';
-import {PostalCarriersTable, PostalCarrierForm} from './postalcarriers.js';
+import {PostalCarriersTable, PostalCarrierForm,PostalZonesForm} from './postalcarriers.js';
 
 let cdiPZ=new CommonDataInterface('PostalZones','/api/PostalZones');
 let cdiPZM=new CommonDataInterface('PostalZoneMembers','/api/PostalZoneMembers');
@@ -15,9 +15,11 @@ class AdminPostalCarriers{
 			tbody:document.getElementById('admin_postal_carriers_tbody'),
 			tfoot:document.getElementById('admin_postal_carriers_tfoot')
 		};
-		this.formContainer=document.getElementById('postal_carriers_form');
+		this.carrierFormContainer=document.getElementById('postal_carriers_form');
+		this.zoneFormContainer=document.getElementById('postal_zones_form');
 		this.callbacks={
-			createForm: ()=>this.createCarrierForm()
+			createForm: ()=>this.createCarrierForm(),
+			showZones:(id)=>this.showZones(id)
 		};
 		this.start();
 	}
@@ -26,15 +28,20 @@ class AdminPostalCarriers{
 		this.carrierForm.showForm();
 	}
 
+	showZones(id){
+		this.zoneForm.setCurrentId(id);
+	}
+
 	start(){
 		this.carrierTyper=new Typer();
-		this.carrierTyper.addInteger(C.POSTAL_CARRIER_ID,false,'-1','Carrier ID',true)
-			.addString(C.POSTAL_CARRIER_NAME,false,'---','Carrier Name',false,'Must be 2-100 characters.',2,100)
-			.addString(C.POSTAL_CARRIER_DESCRIPTION,false,'---','Carrier Description',false,
+		this.carrierTyper.addInteger(C.POSTAL_CARRIERS_ID,false,'-1','Carrier ID',true)
+			.addString(C.POSTAL_CARRIERS_NAME,false,'---','Carrier Name',false,'Must be 2-100 characters.',2,100)
+			.addString(C.POSTAL_CARRIERS_DESCRIPTION,false,'---','Carrier Description',false,
 				'Must be no longer than 200 characters.',null,200)
-			.addString(C.POSTAL_ZONE_NAME,false,'---','Postal Zones',true);
+			.addString(C.POSTAL_ZONES_NAME,false,'---','Postal Zones',false,'Must be 2-100 characters',2,100);
 		this.carrierTable=new PostalCarriersTable(this.carrierTyper,this.carrierCDI,this.tableElements,this.callbacks);
-		this.carrierForm=new PostalCarrierForm(this.carrierTyper,this.carrierCDI,this.formContainer);
+		this.carrierForm=new PostalCarrierForm(this.carrierTyper,this.carrierCDI,this.carrierFormContainer);
+		this.zoneForm=new PostalZonesForm(this.carrierTyper,this.zoneCDI,this.zoneFormContainer);
 	}
 }
 

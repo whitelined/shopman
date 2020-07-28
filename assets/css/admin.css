@@ -173,6 +173,15 @@ Form elements
 .input-container{
 }
 
+.input-container ul{
+	list-style-type: none;
+}
+
+.input-container li{
+	margin: 2px;
+	background-color: lightsalmon;	
+}
+
 .error-span{
 	display: block;
 	position: absolute;

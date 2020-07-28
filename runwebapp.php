@@ -30,6 +30,11 @@ $webapp->Post('api/PostalCarriers',function(){
 	$o=new API\Api_PostalCarriers($c);
 });
 
+$webapp->Post('api/PostalZones',function(){
+	$c=new Lib\PostalZones(
+		M::GetManifestItem('MainDB'));
+	$o=new API\Api_PostalZones($c);
+});
 
 $webapp->Post('api/Regions',function(){
 	$c=new Lib\Regions(

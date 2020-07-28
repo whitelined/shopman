@@ -59,7 +59,7 @@ export class CountriesTable extends DataTableController{
 			.addColumn(C.COUNTRIES_CODE2)
 			.addColumn(C.COUNTRIES_CODE3)
 			.addColumn(this.regionIDAlias)
-			.addToolbarItem('custom','\u229E','create')
+			.addToolbarItem('custom',C.UI_CREATE_GLYPH,'create')
 			.addToolbarItem('selectAll','\u2611')
 			.addToolbarItem('selectNone','\u2610')
 			.addToolbarItem('delete',String.fromCodePoint(0x1F5D1),'delete');
@@ -102,7 +102,7 @@ export class CountriesTable extends DataTableController{
 			.where(C.COUNTRIES_ID,rowId,'=').send();
 		if(!d)
 			return;
-		this.refreshData();
+		this.refresh();
 	}
 
 	async deleteCountries(ids){

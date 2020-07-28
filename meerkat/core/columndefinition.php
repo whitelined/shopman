@@ -28,7 +28,7 @@ class ColumnDefinition{
 	public $filterRestrictions=null;
 	public $dataTransformer=null;
 	public $selectable=false;
-	public $ordable=false;
+	public $orderable=false;
 	public $updatable=false;
 	public $insertable=false;
 
@@ -92,7 +92,7 @@ class ColumnDefinition{
 	 * @return ColumnDefinition
 	 */
 	public function Orderable():ColumnDefinition{
-		$this->ordable=true;
+		$this->orderable=true;
 		return $this;
 	}
 

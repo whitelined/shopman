@@ -82,7 +82,8 @@ abstract class TypicalDataInterface{
 		$st=$this->sql->Start()
 			->Update()
 			->Set($set)
-			->Where($this->defaultId,$where[$this->defaultId])
+			->Where($this->defaultId)
+			->CompareValue($where[$this->defaultId])
 			->GetStatement();
 		$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
 		if($rowCount=1)
@@ -94,7 +95,8 @@ abstract class TypicalDataInterface{
 		$rowCount=0;
 		$st=$this->sql->Start()
 			->Delete()
-			->Where($this->defaultId,$where[$this->defaultId])
+			->Where($this->defaultId)
+			->CompareValue($where[$this->defaultId])
 			->GetStatement();
 		$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
 		if($rowCount=1)

@@ -1,4 +1,5 @@
 import {DH} from './dh.js';
+import * as C from './constants.js';
 import * as T from './typer.js';
 const DEFAULT_SELECT_SEARCH_VALUE='..search..';
 const SEARCH_DELAY=300;
@@ -308,7 +309,7 @@ export class DataTable{
 				first.value=DEFAULT_SELECT_SEARCH_VALUE;
 				select.value=DEFAULT_SELECT_SEARCH_VALUE;
 				sdiv.appendChild(select);
-				let reset=DH.appendNewWithText(sdiv,'button','\u274C');
+				let reset=DH.appendNewWithText(sdiv,'button',C.UI_DELETE_GLYPH);
 				select.addEventListener('change',e=>this.eventChangeSearchSelect(e));
 				reset.addEventListener('click',e=>this.eventClickSearchCancel(e));
 		}
@@ -322,8 +323,10 @@ export class DataTable{
 				this.renderSearch(c,th);
 			}
 			let t=DH.appendNewWithText(th,'span',this.typer.getPrompt(c.name));
-			t.addEventListener('click',e=>{this.eventClickTitle(e)});
 			t.className=this.classes.titleClass;
+			if(!c.sortable)			
+				return;
+			t.addEventListener('click',e=>{this.eventClickTitle(e)});
 			if(c.name==this.currentSort){
 				if(this.currentDirection=='ASC'){
 					th.appendChild(this.elements.up.cloneNode(true));
@@ -401,7 +404,8 @@ export class DataTable{
 	}
 
 	renderLink(td,value){
-		let a=DH.appendNewWithText(td,a,value);
+		let a=DH.appendNewWithText(td,'a',value);
+		a.href='#';
 		a.addEventListener('click',e=>{this.eventClickLink(e)});
 	}
 
@@ -543,7 +547,6 @@ export class DataTable{
 	}
 
 	eventSelectRow(e){
-		console.log(this.selectedRows);
 		if(e.target&&e.target.tagName.toLowerCase()=='td'){
 			let tr=e.target.parentNode;
 			let id=tr.dataset.id;
@@ -652,7 +655,6 @@ export class DataTable{
 
 	eventCancelEdit(e){
 		let td=e.target.parentNode;
-		console.log(td);
 		let nv=e.target.value;
 		DH.clearChildNodes(td);
 		this.renderEdit(td,td.dataset.value);
