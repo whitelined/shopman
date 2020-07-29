@@ -1,4 +1,5 @@
 import {DH} from './dh.js';
+import {Component} from './component.js';
 import * as C from './constants.js';
 import * as T from './typer.js';
 const DEFAULT_SELECT_SEARCH_VALUE='..search..';
@@ -10,62 +11,39 @@ export const COLUMN_SELECT='select';
 export const COLUMN_CHECK='check';
 export const COLUMN_LINK='link';
 
-export class DataTable{
+export class DataTable extends Component{
 	/**
-	 * 
-	 * @param {Typer} typer 
-	 * @param {Object} elements 
-	 * @param {Object} classes 
+	 * @param {Typer} typer
+	 * @param {DataTableController} controller
 	 */
-	constructor(controller,typer,elements,classes={}){
-		this.controller=controller;
+	constructor(typer,controller){
+		super();
 		this.typer=typer;
-		this.elements=elements;
+		this.controller=controller;
 		this.columns=[];
 		this.currentSort=null;
 		this.currentDirection=null;
 		this.viewSize=20;
 		this.viewOffset=0;
-		this.classes=classes;
 		this.previousRow=2;
 		this.selectedRows=[];
 		this.toolbarItems=[];
 		this.searches={};
 		this.waiting=false;
 
-		if('up' in this.elements===false){
-			this.elements.up=DH.newWithText('span','\u21E7');
-		}
-		if('down' in this.elements===false){
-			this.elements.down=DH.newWithText('span','\u21E9');
-		}
-		if('search' in this.elements===false){
-			this.elements.search=DH.newWithText('span',String.fromCodePoint(0x1F50D));
-		}
-		if('searchButton' in this.classes===false){
-			this.classes.searchButton='search-button';
-		}
-		if('searchOutline' in this.classes===false){
-			this.classes.searchOutline='search-outline';
-		}
-		if('titleClass' in this.classes===false){
-			this.classes.titleClass='datatable-title';
-		}
-		if('searchForm' in this.classes===false){
-			this.classes.titleClass='datatable-search-form';
-		}
-		if('row1' in this.classes===false){
-			this.classes.row1='datatable row1';
-		}
-		if('row2' in this.classes===false){
-			this.classes.row2='datatable row2';
-		}
-		if('row1Selected' in this.classes===false){
-			this.classes.row1Selected='datatable row1 selected';
-		}
-		if('row2Selected' in this.classes===false){
-			this.classes.row2Selected='datatable row2 selected';
-		}
+		this.expectingElement('thead','Table Head',true,null)
+			.expectingElement('tbody','Table body',true,null)
+			.expectingElement('tfoot','Table foot',true,null)
+			.expectingElement('up','Sort up arrow.',false,DH.newWithText('span','\u21E7'))
+			.expectingElement('down','Sort down arrow.',false,DH.newWithText('span','\u21E9'))
+			.expectingElement('search','Search.',false,DH.newWithText('span',String.fromCodePoint(0x1F50D)))
+			.expectingClassName('searchButton','',false,'search-button')
+			.expectingClassName('searchOutline','',false,'search-outline')
+			.expectingClassName('titleClass','',false,'search-button')
+			.expectingClassName('row1','Row 1 style.',false,'datatable row1')
+			.expectingClassName('row2','Row 2 style.',false,'datatable row2')
+			.expectingClassName('row1Selected','Row 1 style selected.',false,'datatable row1 selected')
+			.expectingClassName('row2Selected','Row 2 style selected.',false,'datatable row2 selected');
 	}
 
 	setSort(name,direction){
@@ -152,6 +130,9 @@ export class DataTable{
 			throw 'Column "'+name+'" already exists';
 		let t=this.typer.getType(name);
 		switch(t){
+			case T.TYPE_CONSTANT:
+				this.addTextColumn(name,t,sortable,searchable);
+				break;
 			case T.TYPE_INT:
 			case T.TYPE_REGEX:
 			case T.TYPE_STRING:
@@ -290,10 +271,10 @@ export class DataTable{
 
 	renderSearch(column,th){
 		let div=DH.appendNew(th,'div');
-		div.className=this.classes.searchButton;
+		div.className=this.classNames.searchButton;
 		div.appendChild(this.elements.search.cloneNode(true));
 		let sdiv=DH.appendNew(div,'div');
-		sdiv.className=this.classes.searchOutline;
+		sdiv.className=this.classNames.searchOutline;
 		sdiv.dataset.name=column.name;
 		switch(column.type){
 			case COLUMN_TEXT:
@@ -323,7 +304,7 @@ export class DataTable{
 				this.renderSearch(c,th);
 			}
 			let t=DH.appendNewWithText(th,'span',this.typer.getPrompt(c.name));
-			t.className=this.classes.titleClass;
+			t.className=this.classNames.titleClass;
 			if(!c.sortable)			
 				return;
 			t.addEventListener('click',e=>{this.eventClickTitle(e)});
@@ -457,19 +438,19 @@ export class DataTable{
 
 	changeRow(tr,row,selected){
 		if(row==1&&!selected){
-			tr.className=this.classes.row1;
+			tr.className=this.classNames.row1;
 			tr.dataset.row=1;
 		}
 		else if(row==2&&!selected){
-			tr.className=this.classes.row2;
+			tr.className=this.classNames.row2;
 			tr.dataset.row=2;
 		}
 		else if(row==1&&selected){
-			tr.className=this.classes.row1Selected;
+			tr.className=this.classNames.row1Selected;
 			tr.dataset.row=1;
 		}
 		else{
-			tr.className=this.classes.row2Selected;
+			tr.className=this.classNames.row2Selected;
 			tr.dataset.row=2;
 		}
 	}
@@ -613,7 +594,7 @@ export class DataTable{
 	eventClickPage(e){
 		e.preventDefault();
 		this.viewOffset=parseInt(e.target.dataset.viewOffset);
-		this.controller.view(this.viewSize,this.viewOffset);
+		this.controller.setView(this.viewSize,this.viewOffset);
 		this.controller.refresh();
 	}
 
@@ -676,8 +657,9 @@ export class DataTable{
 	}
 }
 
-export class DataTableController{
+export class DataTableController extends Component{
 	constructor(){
+		super();
 		this.view={};
 		this.sort={};
 	}

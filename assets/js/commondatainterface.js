@@ -14,6 +14,7 @@ export class CommonDataInterface{
 	constructor(name,objectUrl){
 		this.name=name;
 		this.objectUrl=objectUrl;
+		this.currentData=null;
 	}
 
 	insert(){
@@ -99,15 +100,41 @@ export class CommonDataInterface{
 		return this;
 	}
 
-	async send(){
-		return await this.fetchJson(JSON.stringify(this.currentQuery));
+	/**
+	 * Gets the data from the last send request.
+	 * @returns {object} Data returned, or false if non.
+	 */
+	getData(){
+		if(!this.currentData.data)
+			return false;
+		return this.currentData.data;
 	}
 
-	async fetchJson(json){
+	/**
+	 * Gets the size of the data from the last send request.
+	 * @returns {int} Size of data, or false if non.
+	 */
+	getDataSize(){
+		if(!this.currentData.size)
+			return false;		
+		return this.currentData.size;
+	}
+
+	/**
+	 * Gets the total size of the data source from the last send request.
+	 * @returns {int} Size of source data, or false if non.
+	 */
+	getTotalSize(){
+		if(!this.currentData.totalSize)
+			return false;		
+		return this.currentData.totalSize;
+	}
+
+	async send(){
 		try{
 			let r=await fetch(this.objectUrl,
 			{method:'post',headers:{'Content-Type':'application/json'},
-			body:json});
+			body:JSON.stringify(this.currentQuery)});
 			if(!r.ok)
 				throw new Error(r.statusText);
 			let d=await r.json();
@@ -119,12 +146,12 @@ export class CommonDataInterface{
 				this.queryError(d.queryResponseCode);
 				return false;
 			}
-			return d;
+			this.currentData=d;
 		}
 		catch(e){
 			console.log(e);
 			alert('Exception: '+e);
-			return false;
+			throw e;
 		}
 	}
 

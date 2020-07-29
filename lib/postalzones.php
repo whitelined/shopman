@@ -11,7 +11,7 @@ class PostalZones extends TypicalDataInterface{
 	public function __construct(\PDO $db){
 		$this->Init($db,[
 				self::id=>'integer',
-				PostalZones::id=>'integer',
+				PostalCarriers::id=>'integer',
 				self::name=>'text'],
 			self::id,self::table,self::schema);
 	}
@@ -22,7 +22,7 @@ class PostalZones extends TypicalDataInterface{
 			->CreateColumn(PostalCarriers::id,'int')
 			->AppendForeignKey(PostalCarriers::id,PostalCarriers::table,PostalCarriers::schema)
 			->CreateColumn(self::name,'text')
-			->AddUniqueConstraint(self::name)
+			->AddUniqueConstraint([PostalCarriers::id,self::name])
 			->AddPrimaryKey(self::id)
 			->EndTable()
 			->GetStatement()

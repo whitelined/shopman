@@ -6,7 +6,7 @@ use \Meerkat\Core\CommonDataInterface as CDI;
 use \Meerkat\Core\ColumnDefinition;
 use \Lib\Countries;
 
-class Api_PostalZoneMembers extends CDI{
+class Api_PostalZoneMapping extends CDI{
 	private $country;
 
 	public function __construct(Countries $country){

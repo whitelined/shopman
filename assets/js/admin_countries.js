@@ -2,6 +2,7 @@ import * as C from './constants.js';
 import {Typer} from './typer.js';
 import {CommonDataInterface as CDI} from './commondatainterface.js';
 import {CountriesTable,CountriesForm} from './countries.js';
+import {Component} from './component.js';
 
 const REGION_ID_FORM=C.REGION_ID+'_form';
 const REGION_ID_TABLE=C.REGION_ID+'_table';
@@ -10,19 +11,9 @@ class AdminCountries{
 	constructor(){
 		this.ccdi=new CDI('Countries','/api/Countries');
 		this.rcdi=new CDI('Regions','/api/Regions');
-		this.tableElements={
-			thead:document.getElementById('admin_countries_thead'),
-			tbody:document.getElementById('admin_countries_tbody'),
-			tfoot:document.getElementById('admin_countries_tfoot')
-		};
-		this.formContainer=document.getElementById('country_form');
 		this.start();
 	}
 
-	showNewCountryForm(){
-		this.form.showForm();
-	}
-	
 	setTyperRegions(regions){
 		this.typer.resetListOptions(REGION_ID_FORM);
 		this.typer.resetListOptions(REGION_ID_TABLE);
@@ -35,15 +26,13 @@ class AdminCountries{
 	}
 
 	async getRegions(){
-		let d=await this.rcdi.get()
+		await this.rcdi
+			.get()
 			.columns('*')
 			.order(C.REGION_NAME,C.DIRECTION_UP)
-			.send();	
-		if(!d){
-			alert('Failed to get region data.');
-			return;
-		}
-		return d.data;
+			.send()
+			.catch(e=>{throw e});	
+		return this.rcdi.getData();
 	}
 	
 	async start(){
@@ -56,10 +45,14 @@ class AdminCountries{
 			.addList(REGION_ID_FORM,C.REGION_ID,C.SELECT_DEFAULT_TEXT,'Region','Select region from list.',false)
 			.addList(REGION_ID_TABLE,C.REGION_ID,C.SELECT_NULL_ID,'Region','Select region from list.',false);
 		this.setTyperRegions(this.regions);
-		this.table=new CountriesTable(this.typer,REGION_ID_TABLE,
-			this.ccdi,this.tableElements,()=>this.showNewCountryForm());
-		this.form=new CountriesForm(this.typer,this.ccdi,REGION_ID_FORM,this.formContainer);
+		this.form=new CountriesForm(this.typer,this.ccdi,REGION_ID_FORM);
+		this.table=new CountriesTable(this.typer,REGION_ID_TABLE,this.ccdi,this.form);
 	}
 }
 
-let ac=new AdminCountries();
+try{
+	let ac=new AdminCountries();
+}
+catch(err){
+	console.log(err);
+}

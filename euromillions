@@ -1,0 +1,187 @@
+#!/usr/bin/php
+<?php
+
+function printCommand(){
+	echo "Usage:\n";
+	echo "randman -N3R1..45 -R1\n";
+	echo "-N is the number of random numbers, R is the range\n";
+	echo "-R optional, number of sets to generate\n";
+}
+
+function arraySwap(&$a,$from,$to){
+	$e1=$a[$from];
+	$e2=$a[$to];
+	$a[$from]=$e2;
+	$a[$to]=$e1;
+}
+
+function jiggleBalls(&$balls){
+	$timeSeconds=mt_rand(1,16)*10000000;
+	$timeMSeconds=mt_rand(1,999)*100000;
+	$timeNSeconds=mt_rand(1,999);
+	$timeToTake=$timeSeconds+$timeMSeconds+$timeNSeconds;
+	$start=hrtime(true);
+	$endTime=$start+$timeToTake;
+	$size=count($balls);
+	$jiggles=0;
+	$currentTime=0;
+
+	for($i=0;$i<mt_rand(30,23223);$i++){
+		for($j=0;$j<$size;$j++){
+			arraySwap($balls,$j,mt_rand(0,$size-1));
+		}
+	}
+
+	do{
+		$s1=mt_rand(0,$size-1);
+		$s2=mt_rand(0,$size-1);
+		arraySwap($balls,$s1,$s2);
+		$jiggles++;
+		$currentTime=hrtime(true);
+	}while($currentTime<$endTime);
+	//echo "Current balls: ".implode(',',$balls)."\n";
+	//echo "Jiggles $jiggles in ".(($currentTime-$start)/1000000000)."s\n";
+}
+
+function getRandomNumberOrg($min, $max,$number,$replacement=true){
+	$jsonrpc=[
+		"jsonrpc"=>"2.0",
+		"method"=>"generateIntegers",
+		"params"=>[
+			"apiKey"=>"cd28a225-8f0c-49a2-9827-b65c4323daa9",
+			"n"=>$number,
+			"min"=>$min,
+			"max"=>$max,
+			"replacement"=>$replacement
+		],
+		"id"=>7772
+	];
+	//echo "spamming Random.org...\n";
+	$ch=curl_init("https://api.random.org/json-rpc/2/invoke");
+	$payload=json_encode($jsonrpc);
+	curl_setopt($ch,CURLOPT_POSTFIELDS,$payload);
+	curl_setopt($ch,CURLOPT_HTTPHEADER,array('Content-Type:application/json'));
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+	$result=curl_exec($ch);
+	if($result===false){
+		echo "Error getting from Random.org\n";
+		exit;
+	}
+	curl_close($ch);
+	$result=json_decode($result,true);
+	$n=$result['result']['random']['data'];
+	return $n;
+}
+
+function DropBallIn(&$drum,$ball){
+	$curBall=$ball;
+	while(1){
+		$location=mt_rand(0,count($drum)-1);
+		if($drum[$location]=='empty'){
+			$drum[$location]=$curBall;
+			return;
+		}
+		else{
+			$old=$drum[$location];
+			$drum[$location]=$curBall;
+			$curBall=$old;
+		}
+	}
+}
+
+function GenerateFlutes($size,$setOfBalls){
+	$flutes=[];
+	$newFlute=[];
+	for($i=0;$i<count($setOfBalls);$i++){
+		$newFlute[]=$setOfBalls[$i];
+		if(count($newFlute)==$size){
+			$flutes[]=$newFlute;
+			$newFlute=[];
+		}
+	}
+	return $flutes;
+}
+
+function GenerateDrum($size){
+	$drum=[];
+	for($i=0;$i<$size;$i++){
+		$drum[$i]='empty';
+	}
+	return $drum;
+}
+
+function Drawer($drum,$flutes,$drawers,$min,$max){
+	$loops=0;
+	$state='empty';
+	$startTime=hrtime(true);
+	$lastBall=0;
+	$lastDraw=0;
+	$nextDraw=1;
+	$set=[];
+	while(1){
+		$now=hrtime(true);
+		if($state=='empty'){
+			if($now-$startTime>7000000000){
+				$state='dropping';
+			}
+			$lastBall=hrtime(true);
+			continue;
+		}
+		else if($state=='dropping'){
+			if($now-$lastBall>mt_rand(7000000,12000000)){
+				$f=mt_rand(0,count($flutes)-1);
+				$r=mt_rand(0,count($flutes[$f])-1);
+				$ball=$flutes[$f][$r];
+				array_splice($flutes[$f],$r,1);
+				if(count($flutes[$f])<1){
+					array_splice($flutes,$f,1);
+				}
+				DropBallIn($drum,$ball);
+				$lastBall=hrtime(true);
+				if(count($flutes)==0){
+					$state='full';
+					$lastDraw=hrtime(true);
+				}
+			}
+			$loops++;
+		}
+		else if($state=='full'){
+			jiggleBalls($drum);
+			if($now-$lastDraw>mt_rand(4000000000,5000000000)){
+				echo "Drawing Ball $nextDraw .... ";
+				$new=$drum[getRandomNumberOrg($min,$max,1)[0]];
+				echo "{$new}!\n";
+				$set[]=$new;
+				if($drawers==$nextDraw){
+					return $set;
+				}
+				$nextDraw++;
+				$lastDraw=hrtime(true);
+			}
+		}
+	}
+}
+
+echo "Loading Main EuroMillion balls\n";
+
+$mainSet=getRandomNumberOrg(1,50,50,false);
+if(count($mainSet)!=50){
+	exit('Failed on getting 50 random numbers');
+}
+
+$bonusSet=getRandomNumberOrg(1,12,12,false);
+if(count($mainSet)!=50){
+	exit('Failed on getting 12 random numbers');
+}
+
+$flutes=GenerateFlutes(5,$mainSet);
+$drum=GenerateDrum(50);
+echo "Beginning drawer of main EuroMillion balls\n";
+$m=Drawer($drum,$flutes,5,20,30);
+
+$flutes=GenerateFlutes(6,$bonusSet);
+$drum=GenerateDrum(12);
+echo "Beginning drawer of EuroMillion lucky stars\n";
+$ls=Drawer($drum,$flutes,2,3,7);
+
+echo "Final Numbers: ".implode(',',$m).'|'.implode(',',$ls);

@@ -1,55 +1,47 @@
 import {DH} from './dh.js';
+import {Component} from './component.js';
 import * as T from './typer.js';
 import * as C from './constants.js';
-export class Form{
+export class Form extends Component{
 	/**
 	 * 
-	 * @param {FormController} controller 
 	 * @param {Typer} typer 
-	 * @param {HTMLElement} container 
-	 * @param {Object} classes 
+	 * @param {FormController} controller
 	 * @param {String} prefix 
 	 */
-	constructor(controller,typer,container,classes,prefix){
-		this.controller=controller;
+	constructor(typer,controller,prefix){
+		super();
 		this.typer=typer;
-		this.container=container;
-		this.classes=classes;
-		this.elements={inputs:{},rows:{}};
+		this.controller=controller;
+		this.formElements={inputs:{},rows:{}};
 		this.prefix=prefix;
-		this.submitCallback=null;
-		this.startForm();
+		this.expectingClassName('formFrame','Form Frame',false,'square')
+			.expectingClassName('inputRowContainer','Div container for input row',false,'input-row-container')
+			.expectingClassName('inputContainer','Div for input elements',false,'input-container')
+			.expectingClassName('errorSpan','Error message',false,'error-span');
 	}
 
 	getPrefixName(name){
 		return this.prefix+name;
 	}
 
-	showForm(){
-		this.container.className=this.classes.formShow;
-	}
-
-	hideForm(){
-		this.container.className=this.classes.formHide;
-	}
-
 	startForm(){
-		DH.clearChildNodes(this.container);
-		this.elements.frame=DH.appendNew(this.container,'div');
-		this.elements.frame.className=this.classes.formFrame;
-		this.elements.form=DH.appendNew(this.elements.frame,'form');
-		this.elements.form.addEventListener('submit',e=>{this.submitFormEvent(e)});
+		DH.clearChildNodes(this.mainContainer);
+		this.formElements.frame=DH.appendNew(this.mainContainer,'div');
+		this.formElements.frame.className=this.classNames.formFrame;
+		this.formElements.form=DH.appendNew(this.formElements.frame,'form');
+		this.formElements.form.addEventListener('submit',e=>{this.submitFormEvent(e)});
 		return this;
 	}
 
 	setError(name){
-		if(this.elements.inputs[name].errorSpan.innerText.length==0)
-			DH.appendText(this.elements.inputs[name].errorSpan,
+		if(this.formElements.inputs[name].errorSpan.innerText.length==0)
+			DH.appendText(this.formElements.inputs[name].errorSpan,
 				this.typer.getError(name));
 	}
 
 	removeError(name){
-		DH.clearChildNodes(this.elements.inputs[name].errorSpan);
+		DH.clearChildNodes(this.formElements.inputs[name].errorSpan);
 	}
 
 	/**
@@ -58,12 +50,12 @@ export class Form{
 	 * @param {*} value Value
 	 */
 	setValue(name,value){
-		switch(this.elements.inputs[name].type){
+		switch(this.formElements.inputs[name].type){
 			case 'input':
-				this.elements.inputs[name].input.value=value;
+				this.formElements.inputs[name].input.value=value;
 				break;
 			case 'select':
-				this.elements.inputs[name].select.value=value;
+				this.formElements.inputs[name].select.value=value;
 				break;
 			case 'list':
 				this.setListValues(name,value);
@@ -72,7 +64,7 @@ export class Form{
 	}
 
 	setListValues(name,values){
-		let ul=this.elements.inputs[name].ul;
+		let ul=this.formElements.inputs[name].ul;
 		DH.clearChildNodes(ul);
 		if(values.length<1){
 			let li=DH.appendNewWithText(ul,'li','{empty}');
@@ -91,8 +83,8 @@ export class Form{
 
 	gatherValues(){
 		let values={};
-		for(const k in this.elements.inputs){
-			switch(this.elements.inputs[k].type){
+		for(const k in this.formElements.inputs){
+			switch(this.formElements.inputs[k].type){
 				case 'input':
 				case 'select':
 					let dataName=this.typer.getDataName(k);
@@ -104,12 +96,12 @@ export class Form{
 	}
 
 	getValue(name){
-		switch(this.elements.inputs[name].type){
+		switch(this.formElements.inputs[name].type){
 			case 'input':
-				return this.elements.inputs[name].input.value;
+				return this.formElements.inputs[name].input.value;
 			case 'select':
-				return this.elements.inputs[name].select.
-					options[this.elements.inputs[name].select.selectedIndex].value;
+				return this.formElements.inputs[name].select.
+					options[this.formElements.inputs[name].select.selectedIndex].value;
 		}
 	}
 
@@ -120,16 +112,16 @@ export class Form{
 	 * @returns {HTMLElement} Returns element to put input in, or empty row
 	 */
 	createNewRow(name,prefixName,empty=false){
-		let div=DH.appendNew(this.elements.form,'div');
-		div.className=this.classes.inputRowContainer;
+		let div=DH.appendNew(this.formElements.form,'div');
+		div.className=this.classNames.inputRowContainer;
 		div.dataset.name=name;
-		this.elements.rows[name]=div;
+		this.formElements.rows[name]=div;
 		if(empty)
 			return div;
 		let label=DH.appendNewWithText(div,'label',this.typer.getPrompt(name));
 		label.htmlFor=prefixName;
 		let div2=DH.appendNew(div,'div');
-		div2.className=this.classes.inputContainer;
+		div2.className=this.classNames.inputContainer;
 		return div2;
 	}
 
@@ -186,8 +178,8 @@ export class Form{
 		input.dataset.name=name;
 		input.autocomplete='off';
 		let errorSpan=DH.appendNew(row,'span');
-		errorSpan.className=this.classes.errorSpan;
-		this.elements.inputs[name]={
+		errorSpan.className=this.classNames.errorSpan;
+		this.formElements.inputs[name]={
 			type:'input',
 			input:input,
 			dataType: dataType,
@@ -205,7 +197,7 @@ export class Form{
 		let select=this.typer.generateFormElement(name,true);
 		row.appendChild(select);
 		select.dataset.name=name;
-		this.elements.inputs[name]={
+		this.formElements.inputs[name]={
 			type:'select',
 			dataType: dataType,
 			select:select
@@ -229,12 +221,12 @@ export class Form{
 		input.addEventListener('input',e=>{this.eventTextInput(e)});
 		div.appendChild(input);
 		let errorSpan=DH.appendNew(div,'span');		
-		errorSpan.className=this.classes.errorSpan;
+		errorSpan.className=this.classNames.errorSpan;
 		let button=DH.appendNewWithText(div,'button',C.UI_CREATE_GLYPH);
 		button.addEventListener('click',e=>this.eventClickAddToList(e));
 		button.type='button';
 		button.dataset.name=name;
-		this.elements.inputs[name]={
+		this.formElements.inputs[name]={
 			type:'list',
 			dataType: dataType,
 			ul:ul,
@@ -245,7 +237,7 @@ export class Form{
 
 	addButtonGroup(name){
 		let row=this.createNewRow(name,'bg',true);
-		this.elements.inputs[name]={
+		this.formElements.inputs[name]={
 			type:'buttonGroup',
 			row:row
 		};
@@ -259,7 +251,7 @@ export class Form{
 			row=this.createNewRow(name,'bg',true);
 		}
 		else{
-			row=this.elements.inputs[group].row;
+			row=this.formElements.inputs[group].row;
 		}
 		let b=DH.appendNewWithText(row,'button',label);
 		b.dataset.name=name;
@@ -296,16 +288,17 @@ export class Form{
 
 	eventClickAddToList(e){
 		e.preventDefault();
-		addListItem();
+		this.controller.addListItem(e.target.dataset.name,
+			e.target.parentNode.firstChild.value);
 	}
 
 	async submitFormEvent(e){
 		let errors=[];
 		e.preventDefault();
-		for(const k in this.elements.inputs){
-			switch(this.elements.inputs[k].type){
+		for(const k in this.formElements.inputs){
+			switch(this.formElements.inputs[k].type){
 				case 'input':
-					if(!this.elements.inputs[k].input.validity.valid){
+					if(!this.formElements.inputs[k].input.validity.valid){
 						errors.push(this.typer.getError(k));
 					}
 					break;
@@ -323,7 +316,7 @@ export class Form{
 		else{
 			let r=await this.controller.submitForm(this.gatherValues());
 			if(r){
-				this.hideForm();
+				this.hideComponent();
 			}
 		}
 	}
@@ -338,7 +331,7 @@ export class Form{
 
 	eventCancelButtonClick(e){
 		e.preventDefault();
-		this.hideForm();
+		this.hideComponent();
 	}
 
 	eventTextFocus(e){
@@ -358,23 +351,16 @@ export class Form{
 	}
 }
 
-export class FormController{
-	constructor(form){
-	}
-	
-	showForm(){
-		this.form.showForm();
-	}
-
-	hideForm(){
-		this.form.hideForm();
+export class FormController extends Component{
+	constructor(){
+		super();
 	}
 
 	clickButton(name){
 		alert('clickButton not implemented.');
 	}
 
-	submitForm(values){
+	async submitForm(values){
 		alert('submitForm not implemented.');
 	}
 

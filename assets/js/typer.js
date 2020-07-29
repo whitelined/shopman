@@ -7,6 +7,7 @@ export const TYPE_INT='integer';
 export const TYPE_STRING='string';
 export const TYPE_REGEX='regex';
 export const TYPE_LIST='list';
+export const TYPE_CONSTANT='constant';
 
 export class Typer{
 	constructor(){
@@ -41,6 +42,8 @@ export class Typer{
 				return this.generateInput(name,setDefault);
 			case TYPE_LIST:
 				return this.generateSelect(name,setDefault);
+			case TYPE_CONSTANT:
+				break;
 		}
 	}
 
@@ -149,6 +152,20 @@ export class Typer{
 			default:
 				throw 'Invalid type found';
 		}
+	}
+
+	/**
+	 * Adds a constant value.
+	 * @param {string} name Alias of comparison 
+	 * @param {string} prompt Prompt text to use.
+	 */
+	addConstant(name,dataName,prompt){
+		this.definitions[name]={
+			dataName:(!dataName)?name:dataName,
+			type:TYPE_CONSTANT,
+			prompt:prompt
+		}
+		return this;
 	}
 
 	/**

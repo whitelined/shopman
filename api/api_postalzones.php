@@ -2,6 +2,7 @@
 
 namespace Api;
 
+use Lib\PostalCarriers;
 use \Meerkat\Core\CommonDataInterface as CDI;
 use \Meerkat\Core\ColumnDefinition;
 use Lib\PostalZones;
@@ -13,8 +14,10 @@ class Api_PostalZones extends CDI{
 		$this->pz=$pz;
 		$id=(new ColumnDefinition(PostalZones::id,true,true,false,false))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get','delete','update']);
 		$name=(new ColumnDefinition(PostalZones::name,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['ILIKE','=','!='],['get']);
+		$cid=(new ColumnDefinition(PostalCarriers::id,true,true,false,true))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get']);
 		$this->AddColumnDefinition($id);
 		$this->AddColumnDefinition($name);
+		$this->AddColumnDefinition($cid);
 		$this->ReceiveData();
 	}
 

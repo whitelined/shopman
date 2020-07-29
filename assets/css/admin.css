@@ -178,7 +178,8 @@ Form elements
 }
 
 .input-container li{
-	margin: 2px;
+	padding: 10px 7px 10px 7px;
+	margin: 5px;
 	background-color: lightsalmon;	
 }
 
