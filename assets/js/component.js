@@ -2,8 +2,11 @@ export class Component{
 	static currentMessageGroup='default';
 	static messageGroups={};
 	static stack=1;
-	static showClass='blankout show';
-	static hideClass='blankout';
+
+	static containerClasses={
+		table:{show:'table-container show',hide:'table-container'},
+		form:{show:'blankout show',hide:'blankout'}
+	};
 
 	constructor(autoAdd=true,aliasFor=null){
 		this.messageRoutes={};
@@ -23,12 +26,8 @@ export class Component{
 		this.mainContainer.className=Component.showClass;
 	}
 
-	static setShowClass(showClass){
-		Component.showClass=showClass;
-	}
+	static addContainerClass(){
 
-	static setHideClass(hideClass){
-		Component.hideClass=hideClass;
 	}
 
 	/**

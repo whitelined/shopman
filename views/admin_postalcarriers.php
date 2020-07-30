@@ -9,9 +9,11 @@ $this->AddTemplate('admin_top');
 </div>
 
 <div id="postal_zone_mapping_table" class="blankout">
+<table class="datatable">
 <thead id="admin_postal_zone_mapping_thead"></thead>
 <tbody id="admin_postal_zone_mapping_tbody"></tbody>
 <tfoot id="admin_postal_zone_mapping_tfoot"></tfoot>
+</table>
 </div>
 
 <table class="datatable">

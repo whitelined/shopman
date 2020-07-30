@@ -23,7 +23,8 @@ class PostalCarriers extends TypicalDataInterface{
 			$this->sql->Start()->StartSub()
 				->Select(['array_to_json(array_agg('.PostalZones::name.'))'])
 				->From(PostalZones::table,PostalZones::schema,'p')
-				->Where(self::id,'p')
+				->Where()
+				->Column(PostalCarriers::id)
 				->CompareColumn(self::id,'c')
 				->EndSub()
 				->Push('sub');

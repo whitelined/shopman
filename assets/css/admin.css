@@ -131,6 +131,7 @@ color: green;
 }
 
 .blankout {
+	display: none;
 	top: 0px;
 	position: fixed;
 	opacity: 0;
@@ -144,8 +145,17 @@ color: green;
 }
 
 .blankout.show{
+	display: block;
 	opacity: 50;
 	z-index: 50;
+}
+
+.table-container{
+	display: none;
+}
+
+.table-container.show{
+	display: block;
 }
 
 

@@ -31,6 +31,8 @@ class PDOString{
 	private $defaultSchema;
 	private $stores;
 	private $nextWhere;
+	private $previousAction;
+	private $previousValue;
 
 	/**
 	 * Constructor
@@ -66,7 +68,6 @@ class PDOString{
 	}
 
 	private function PrepareBindValue($name,$value,$action):string{
-		$blah=$this->definitions[$name];
 		if(in_array($this->definitions[$name],['text','character','json','jsonb',
 			'time','datetime','date','numeric','real','double precision'])){
 			$type=\PDO::PARAM_STR;
@@ -112,6 +113,10 @@ class PDOString{
 
 	private function FormatWhereClause(string $name,string $alias, array $where):string{
 		$n=$this->FormatColumn($name,$alias);
+		return $n.$this->FormatComparison($name,$where);
+	}
+
+	private function FormatComparison(string $name,array $where):string{
 		if($where['comparison']===null){
 			return "{$n} IS NULL";
 		}
@@ -133,7 +138,7 @@ class PDOString{
 				return "$n IN (".$this->PrepareBindValue($name,$where['comparison'],'w').')';
 			}
 		}
-		return $name.$this->FormatOperator($o)
+		return $this->FormatOperator($o)
 			.$this->PrepareBindValue($name,$where['comparison'],'w');
 	}
 
@@ -170,6 +175,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Reset():PDOString{
+		$this->previousAction='';
 		$this->sql='';
 		$this->bindingValues=[];
 		$this->bindingReferences=[];
@@ -178,6 +184,16 @@ class PDOString{
 		$this->stores=[];
 		$this->columns=[];
 		return $this;
+	}
+
+	/**
+	 * Returns coalesced arguments
+	 *
+	 * @param array ...$as Takes all function parameters. Quote strings in ''.
+	 * @return string Returns formatted coalesce operation.
+	 */
+	public function Coalesce($alias,...$as):string{
+		return 'COALESCE ('.implode(',',$as).')'.(($alias!='')?" AS $alias":'');
 	}
 
 	/**
@@ -227,9 +243,12 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Select(array $columns=null):PDOString{
+		$this->previousAction='select';
 		$this->Append('SELECT');
-		if($columns!==null)
+		if($columns!==null){
 			$this->Columns($columns);
+			$this->previousAction='column';
+		}
 		return $this;
 	}
 
@@ -239,6 +258,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function StartSub():PDOString{
+		$this->previousAction='openSub';
 		$this->Append('(',false);
 		return $this;
 	}
@@ -249,6 +269,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function EndSub():PDOString{
+		$this->previousAction='closeSub';
 		$this->Append(')',false);
 		return $this;
 	}
@@ -261,6 +282,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Update(string $table='',string $schema=''):PDOString{
+		$this->previousAction='tablename';
 		$this->Append("UPDATE ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -273,6 +295,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Insert(string $table='',string $schema=''):PDOString{
+		$this->previousAction='tablename';
 		$this->Append("INSERT INTO ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -285,6 +308,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Delete(string $table='',string $schema=''):PDOString{
+		$this->previousAction='tablename';
 		$this->Append("DELETE FROM ".$this->FormatIdentifier($table,$schema));
 		return $this;
 	}
@@ -296,7 +320,20 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function From(string $table='',string $schema='',string $alias=''):PDOString{
+		$this->previousAction='tablename';
 		$this->Append('FROM '.$this->FormatIdentifier($table,$schema,$alias));
+		return $this;
+	}
+
+	public function LeftJoin(string $table,string $schema,string $alias){
+		$this->previousAction='tablename';
+		$this->Append('LEFT JOIN '.$this->FormatIdentifier($table,$schema,$alias));
+		return $this;
+	}
+
+	public function On($alias1,$column1,$operator,$alias2,$column2=''){
+		$this->previousAction='on';
+		$this->Append("ON {$alias1}.{$column1}".$operator."{$alias2}.".(($column2=='')?$column1:$column2));
 		return $this;
 	}
 
@@ -307,6 +344,9 @@ class PDOString{
 	 * @return PDOString
 	 */
 	public function Set(array $set):PDOString{
+		if($this->previousAction='set')
+			$this->Append(',',false);
+		$this->previousAction='set';
 		$sets=[];
 		foreach($set as $k=>$v){
 			$sets[]="$k=".$this->PrepareBindValue($k,$v,'u');
@@ -322,6 +362,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Text(string $text):PDOString{
+		$this->previousAction='text';
 		$this->Append($text);
 		return $this;
 	}
@@ -332,6 +373,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function StartColumns():PDOString{
+		$this->previousAction='startColumns';
 		$this->columns=[];
 		return $this;
 	}
@@ -345,6 +387,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function AddColumn(string $name, string $from=null, string $as=null):PDOString{
+		$this->previousAction='addColumn';
 		$c='';
 		if($from){
 			$c.="{$from}.";
@@ -363,6 +406,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function EndColumns():PDOString{
+		$this->previousAction='column';
 		$this->Append(implode(',',$this->columns));
 		return $this;
 	}
@@ -371,10 +415,20 @@ class PDOString{
 	 * Appends list of columns
 	 *
 	 * @param array $columns Can be a string of one column name or *, or an array of names;
+	 * @param callable $filter Optional filter callback, that will return transformed name if required.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Columns(array $columns):PDOString{
-		$this->Append(implode(',',$columns));
+	public function Columns(array $columns,$filter=null):PDOString{
+		if($this->previousAction=='column')
+			$this->Append(',',false);
+		$this->previousAction='column';
+		$c=$columns;
+		if($filter){
+			foreach($c as &$v){
+				$v=$filter($v);
+			}
+		}
+		$this->Append(implode(',',$c));
 		return $this;
 	}
 
@@ -387,6 +441,7 @@ class PDOString{
 	 * @return PDOString
 	 */
 	public function AppendColumn(string $name, string $from='', string $as=''):PDOString{
+		$this->previousAction='column';
 		$c='';
 		if($from!=''){
 			$c.="{$from}.";
@@ -400,12 +455,27 @@ class PDOString{
 	}
 
 	/**
+	 * Appends column
+	 *
+	 * @return PDOString
+	 */
+	public function Column($name,$alias=''):PDOString{
+		if($this->previousAction=='column')
+			$this->Append(',',false);
+		$this->previousAction='column';
+		$this->previousValue=$name;
+		$this->Append($this->FormatColumn($name,$alias));
+		return $this;
+	}
+
+	/**
 	 * Appends list of columns for an insert statement.
 	 *
 	 * @param array $columns 
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function InsertColumns(array $columns):PDOString{
+		$this->previousAction='insertColumn';
 		$this->Append('('.implode(',',$columns).')');
 		$this->columnOrder=$columns;//For insert query.
 		return $this;
@@ -426,13 +496,17 @@ class PDOString{
 			}
 			$allRows[]='('.implode(',',$row).')';
 		}
-		$this->Append('VALUES '.implode(',',$allRows));
+		if($this->previousAction=='insertValues')
+			$this->Append(','.implode(',',$allRows));
+		else
+			$this->Append('VALUES '.implode(',',$allRows));
+		$this->previousAction='insertValues';
 		return $this;
 	}
 
 
 	public function CompareValue($comparison):PDOString{
-		$this->Append($this->FormatWhereClause($this->nextWhere[0],$this->nextWhere[1],$comparison));
+		$this->Append($this->FormatComparison($this->previousValue,$comparison));
 		return $this;
 	}
 
@@ -445,21 +519,54 @@ class PDOString{
 	 * @return PDOString
 	 */
 	public function CompareColumn(string $name,string $alias='',string $operator='='):PDOString{
-		$this->Append($this->FormatColumn($this->nextWhere[0],$this->nextWhere[1])
-			.$this->FormatOperator($operator)
+		$this->previousAction='compare';
+		$this->Append($this->FormatOperator($operator)
 			.$this->FormatColumn($name,$alias));
 		return $this;
 	}
 
+	public function CompareNull():PDOString{
+		$this->previousAction='compare';
+		$this->Append("IS NULL");
+		return $this;
+	}
+
+	public function CompareNotNull():PDOString{
+		$this->previousAction='compare';
+		$this->Append("IS NOT NULL");
+			return $this;
+	}
+
+	/**
+	 * Adds OR
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function Or():PDOString{
+		$this->previousAction='or';
+		$this->Append('OR');
+		return $this;
+	}
+
+	/**
+	 * Adds AND
+	 *
+	 * @return PDOString Returns reference to called object, for chaining.
+	 */
+	public function And():PDOString{
+		$this->previousAction='and';
+		$this->Append('AND');
+		return $this;
+	}
+
+
 	/**
 	 * Appends string of a comparison filter
 	 *
-	 * @param string $name Name of Column to filter.
-	 * @param string $alias Optional table alias.
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
-	public function Where(string $name,string $alias=''):PDOString{		
-		$this->nextWhere=[$name,$alias];
+	public function Where():PDOString{
+		$this->previousAction='where';
 		$this->Append("WHERE");
 		return $this;
 	}
@@ -472,6 +579,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function WhereAnd(array $where):PDOString{
+		$this->previousAction='where';
 		$filters=[];
 		foreach($where as $k=>$v){
 			$filters[]=$this->FormatWhereClause($k,'',$v);
@@ -490,6 +598,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function WhereOr(array $where):PDOString{
+		$this->previousAction='where';
 		$filters=[];
 		foreach($where as $k=>$v){
 			$filters[]=$this->FormatWhereClause($k,'',$v);
@@ -507,6 +616,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function Order(array $order):PDOString{
+		$this->previousAction='order';
 		$orders=[];
 		foreach($order as $k=>$v){
 			$orders[]="$k $v";
@@ -543,6 +653,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function StartCreateTable(string $table='',string $schema='',bool $ifNotExists=true):PDOString{
+		$this->previousAction='createTable';
 		$this->newColumns=[];
 		$this->Append('CREATE TABLE');
 		if($ifNotExists)
@@ -559,6 +670,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function CreateColumn(string $name,string $type):PDOString{
+		$this->previousAction='createTableColumn';
 		$this->newColumns[]="$name $type";
 		return $this;
 	}
@@ -572,6 +684,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function AppendForeignKey(string $name,string $table,string $schema):PDOString{
+		$this->previousAction='createTableForeignKey';
 		$k=array_key_last($this->newColumns);
 		$this->newColumns[$k].=' REFERENCES '.
 			$this->FormatIdentifier($table,$schema) ." ($name)";
@@ -585,6 +698,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function AddPrimaryKey($key):PDOString{
+		$this->previousAction='createTablePrimaryKey';
 		if(is_array($key))
 			$this->newColumns[]="PRIMARY KEY (".implode($key).")";
 		else
@@ -599,6 +713,7 @@ class PDOString{
 	 * @return PDOString Returns reference to called object, for chaining.
 	 */
 	public function AddUniqueConstraint($columns):PDOString{
+		$this->previousAction='createTableUnique';
 		if(is_array($columns))
 			$this->newColumns[]="UNIQUE (".implode(',',$columns).")";
 		else
@@ -612,6 +727,7 @@ class PDOString{
 	 * @return PDOString
 	 */
 	public function EndTable():PDOString{
+		$this->previousAction='createTableEnd';
 		$this->Append(implode(',',$this->newColumns));
 		$this->Append(')');
 		return $this;

@@ -36,6 +36,12 @@ $webapp->Post('api/PostalZones',function(){
 	$o=new API\Api_PostalZones($c);
 });
 
+$webapp->Post('api/PostalZoneMapping',function(){
+	$c=new Lib\PostalZoneMapping(
+		M::GetManifestItem('MainDB'));
+	$o=new API\Api_PostalZoneMapping($c);
+});
+
 $webapp->Post('api/Regions',function(){
 	$c=new Lib\Regions(
 		M::GetManifestItem('MainDB'));

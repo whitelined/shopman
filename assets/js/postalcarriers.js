@@ -2,6 +2,7 @@ import {DataTable,DataTableController} from './datatable.js';
 import {Form,FormController} from './form.js';
 import * as C from './constants.js';
 import { CommonDataInterface } from './commondatainterface.js';
+import { DH } from './dh.js';
 
 export class PostalCarrierForm extends FormController{
 	/**
@@ -110,10 +111,12 @@ export class PostalZoneMappingTable extends DataTableController{
 	 */
 	constructor(typer,regionsCdi,zoneCdi,zoneMapCdi){
 		super();
+		this.currentId=0;
 		this.typer=typer;
 		this.regionsCdi=regionsCdi;
 		this.zoneCdi=zoneCdi;
 		this.zoneMapCdi=zoneMapCdi;
+		this.setupTable();
 	}
 
 	async getRegions(){
@@ -126,11 +129,11 @@ export class PostalZoneMappingTable extends DataTableController{
 		return this.regionsCdi.getData();
 	}
 
-	async getZones(id){
+	async getZones(){
 		await this.zoneCdi
 			.get()
 			.columns('*')
-			.where(C.POSTAL_CARRIERS_ID,id,'=')
+			.where(C.POSTAL_CARRIERS_ID,this.currentId,'=')
 			.order(C.POSTAL_ZONES_NAME,C.DIRECTION_UP)
 			.send()
 			.catch(e=>{throw e});
@@ -138,11 +141,12 @@ export class PostalZoneMappingTable extends DataTableController{
 	}
 
 	async refresh(){
-		await this.zoneMapCdi
+		this.zoneMapCdi
 			.get()
 			.columns('*')
 			.order(this.sort.name,this.sort.direction)
-			.limit(this.view.size,this.view.offset);
+			.limit(this.view.size,this.view.offset)
+			.where(C.POSTAL_CARRIERS_ID,this.currentId,'=');
 		for(const k in this.filters){
 			this.zoneMapCdi.where(k,this.filters[k].comparison
 				,this.filters[k].operator);
@@ -163,6 +167,8 @@ export class PostalZoneMappingTable extends DataTableController{
 			.addColumn(C.COUNTRIES_CODE3)
 			.addColumn(C.REGION_ID)
 			.addColumn(C.POSTAL_ZONES_ID);
+		this.table.setViewSize(50);
+		this.table.setSort(C.COUNTRIES_NAME,C.DIRECTION_UP);
 	}
 
 	updateTyper(regions,zones){
@@ -177,9 +183,11 @@ export class PostalZoneMappingTable extends DataTableController{
 	}
 
 	async showTable(id){
+		this.currentId=id;
 		let regions=await this.getRegions();
-		let zones=await this.getZones(id);
+		let zones=await this.getZones();
 		this.updateTyper(regions,zones);
+		this.setupTable();
 	}
 }
 
