@@ -7,26 +7,29 @@ export const DEFAULT_FORM_CLASSES={
 	errorSpan:'error-span'
 };
 
-export const ELEMENTS_COUNTRY_FORM='country_form';
-export const ELEMENTS_COUNTRY_TABLE={
-	thead:'admin_countries_thead',
-	tbody:'admin_countries_tbody',
-	tfoot:'admin_countries_tfoot'};
-export const ELEMENTS_POSTAL_CARRIER_FORM='postal_carriers_form';
-export const ELEMENTS_POSTAL_ZONES_FORM='postal_zones_form';
-export const ELEMENTS_POSTAL_ZONE_MAPPING='postal_zone_mapping_table';
-export const ELEMENTS_POSTAL_CARRIER_TABLE={
-	thead:'admin_postal_carriers_thead',
-	tbody:'admin_postal_carriers_tbody',
-	tfoot:'admin_postal_carriers_tfoot'};
-export const ELEMENTS_POSTAL_ZONES_MAPPING_TABLE={
-	thead:'admin_postal_zone_mapping_thead',
-	tbody:'admin_postal_zone_mapping_tbody',
-	tfoot:'admin_postal_zone_mapping_tfoot'};
+export const ID_COUNTRY_FORM='country_form';
+export const ID_COUNTRY_TABLE_ELEMENTS={
+	thead:'countries_thead',
+	tbody:'countries_tbody',
+	tfoot:'countries_tfoot'};
+export const ID_POSTAL_CARRIER_FORM='postal_carriers_form';
+export const ID_POSTAL_ZONES_FORM='postal_zones_form';
+export const ID_ELEMENTS_POSTAL_CARRIER_TABLE='postal_carrier_table';
+export const ID_POSTAL_CARRIER_TABLE_ELEMENTS={
+	thead:'postal_carriers_thead',
+	tbody:'postal_carriers_tbody',
+	tfoot:'postal_carriers_tfoot'};
+export const ID_POSTAL_ZONE_MAPPING_TABLE='postal_zone_mapping_table';
+export const ID_POSTAL_ZONES_MAPPING_TABLE_ELEMENTS={
+	thead:'postal_zone_mapping_thead',
+	tbody:'postal_zone_mapping_tbody',
+	tfoot:'postal_zone_mapping_tfoot'};
 	
 
 export const UI_CREATE_GLYPH='\u229E';
 export const UI_DELETE_GLYPH='\u274C';
+export const UI_SELECTALL_GLYPH='\u2611';
+export const UI_UNSELECTALL_GLYPH='\u2610';
 
 
 export const SELECT_NULL_ID=-1;

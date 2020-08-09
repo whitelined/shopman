@@ -1,0 +1,550 @@
+(postal_carrier_id,country_id,postal_zone_id) VALUES (:pdo_i_int_20,:pdo_i_int_21,:pdo_i_int_22) ON CONFLICT (country_id,postal_carrier_id) DO UPDATE SET  postal_zone_id=EXCLUDED.postal_zone_id
+(postal_carrier_id,country_id,postal_zone_id) VALUES (:pdo_i_int_20,:pdo_i_int_21,:pdo_i_int_22) ON CONFLICT (country_id,postal_carrier_id) DO UPDATE SET  postal_zone_id=EXCLUDED.postal_zone_id
+(postal_carrier_id,country_id,postal_zone_id) VALUES (:pdo_i_int_20,:pdo_i_int_21,:pdo_i_int_22) ON CONFLICT (country_id,postal_carrier_id) DO UPDATE SET  postal_zone_id=EXCLUDED.postal_zone_id
+INSERT INTOshopman.postal_zone_mapping (postal_carrier_id,country_id,postal_zone_id) VALUES (:pdo_i_int_20,:pdo_i_int_21,:pdo_i_int_22) ON CONFLICT (country_id,postal_carrier_id) DO UPDATE SET  postal_zone_id=EXCLUDED.postal_zone_id
+INSERT INTO shopman.postal_zone_mapping (postal_carrier_id,country_id,postal_zone_id) VALUES (:pdo_i_int_20,:pdo_i_int_21,:pdo_i_int_22) ON CONFLICT (country_id,postal_carrier_id) DO UPDATE SET  postal_zone_id=EXCLUDED.postal_zone_id
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id3(:pdo_c_int_20) ORDER BY postal_zone_name ASC
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=(:pdo_c_int_20) ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=(:pdo_c_int_21)
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) COALESCE (countries.region_id,-1) AS region_id=(:pdo_c_int_21) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) COALESCE (countries.region_id,-1) AS region_id=(:pdo_c_int_21) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) countries.region_id=(:pdo_c_int_21) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) WHERE countries.region_id=(:pdo_c_int_21) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=(:pdo_c_int_20) WHERE countries.region_id=(:pdo_c_int_21) ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones postal_carrier_id=(:pdo_c_int_20) ORDER BY postal_zone_name ASC
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones postal_carrier_id=(:pdo_c_int_20) ORDER BY postal_zone_name ASC
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT region_id,name FROM shopman.regions WHERE ORDER BY name ASC
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers WHERE
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 AND countries.region_id=:pdo_c_int_22 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY region_id ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY region_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY code_3 DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY code_3 ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY region_id ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY postal_zone_id ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY postal_zone_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY postal_zone_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY postal_zone_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_idIS NULL ORDER BY postal_zone_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id IS NULL ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id IS NULL ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY region_id DESC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY region_id ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT region_id,name FROM shopman.regions ORDER BY name ASC
+SELECT COUNT(*)  AS count FROM shopman.regions
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.country_name ILIKE :pdo_c_str_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id=:pdo_c_int_21 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 WHERE countries.region_id IS NULL ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT countries.country_id,COALESCE (postal_zone_mapping.postal_zone_id,-1) AS postal_zone_id,postal_zone_mapping.postal_carrier_id,countries.country_name,countries.code_2,countries.code_3,COALESCE (countries.region_id,-1) AS region_id FROM shopman.countries LEFT JOIN shopman.postal_zone_mapping ON countries.country_id=postal_zone_mapping.country_id AND postal_zone_mapping.postal_carrier_id=:pdo_c_int_20 ORDER BY country_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_zone_mapping
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_id ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+INSERT INTO shopman.postal_carriers () VALUES 
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+INSERT INTO shopman.postal_carriers (postal_carrier_name,description) VALUES (:pdo_i_str_20,:pdo_i_str_21)
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+UPDATE shopman.postal_carriers SET  postal_carrier_name=:pdo_u_str_20 WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+UPDATE shopman.postal_carriers SET  postal_carrier_name=:pdo_u_str_20 WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+UPDATE shopman.postal_carriers SET  postal_carrier_name=:pdo_u_str_20 WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carriers.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carriers.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_zones.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_zones.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_carrier_id=postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+INSERT INTO shopman.postal_zones (postal_zone_name,postal_carrier_id) VALUES (:pdo_i_str_20,:pdo_i_int_21)
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+DELETE FROM shopman.postal_zones WHERE p=:pdo_c_int_20
+DELETE FROM shopman.postal_zones WHERE p=:pdo_c_int_20
+DELETE FROM shopman.postal_zones WHERE postal_zone_id=:pdo_c_int_20
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+INSERT INTO shopman.postal_zones (postal_zone_name,postal_carrier_id) VALUES (:pdo_i_str_20,:pdo_i_int_21)
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_zone_id,postal_zone_name,postal_carrier_id FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_20 ORDER BY postal_zone_name ASC
+SELECT COUNT(*)  AS count FROM shopman.postal_zones WHERE postal_carrier_id=:pdo_c_int_21
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+DELETE FROM shopman.postal_carriers WHERE postal_carrier_id IN (:pdo_c_int_20)
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+SELECT postal_carrier_id,postal_carrier_name,description, ( SELECT array_to_json(array_agg( postal_zone_name )) FROM shopman.postal_zones WHERE postal_zones.postal_carrier_id=postal_carriers.postal_carrier_id)  AS postal_zone_name FROM shopman.postal_carriers ORDER BY postal_carrier_name ASC OFFSET 0 ROWS FETCH FIRST 50 ROWS ONLY
+SELECT COUNT(*)  AS count FROM shopman.postal_carriers
+CREATE TABLE IF NOT EXISTS shopman.postal_methods( postal_method_id serial,postal_carrier_id integer REFERENCES shopman.postal_carriers (postal_carrier_id) ON DELETE CASCADE,postal_method_name text,UNIQUE (postal_carrier_id,postal_method_name),PRIMARY KEY (postal_method_idintegerpostal_methods) )
+CREATE TABLE IF NOT EXISTS shopman.postal_methods( postal_method_id serial,postal_carrier_id integer REFERENCES shopman.postal_carriers (postal_carrier_id) ON DELETE CASCADE,postal_method_name text,UNIQUE (postal_carrier_id,postal_method_name),PRIMARY KEY (postal_method_idintegerpostal_methods) )
+CREATE TABLE IF NOT EXISTS shopman.postal_methods( postal_method_id serial,postal_carrier_id integer REFERENCES shopman.postal_carriers (postal_carrier_id) ON DELETE CASCADE,postal_method_name text,UNIQUE (postal_carrier_id,postal_method_name),PRIMARY KEY (postal_method_id) )

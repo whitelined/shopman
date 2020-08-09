@@ -37,7 +37,7 @@ class AdminCountries{
 	
 	async start(){
 		this.regions=await this.getRegions();
-		this.typer=new Typer();
+		this.typer=new DataProperties();
 		this.typer.addInteger(C.COUNTRIES_ID,false,'0','Country ID',true,null,0)
 			.addString(C.COUNTRIES_NAME,false,'-','Country Name',false,'Country name needs to be 2-100 characters.')
 			.addRegex(C.COUNTRIES_CODE2,false,'-','ISO Code 2',false,/^[A-Z]{2}$/,'Two characters, [A-Z].')

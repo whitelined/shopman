@@ -61,3 +61,6 @@ CheckTable('Post Zones',$pz);
 
 $pzm=new Lib\PostalZoneMapping($db);
 CheckTable('Postal Zone Mapping',$pzm);
+
+$pzm=new Lib\PostalMethods($db);
+CheckTable('Postal Methods',$pzm);

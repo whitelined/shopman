@@ -35,7 +35,7 @@ class Postage{
 			->execute();
 	}
 
-	public function Update(array $set,array $where):int{
+	public function Update(array $set,array $filters):int{
 		$st=$this->sql->Start()
 			->Update()
 			->Set($set)
@@ -48,7 +48,7 @@ class Postage{
 		return CDI::QUERY_OK;
 	}
 
-	public function Delete(array $where):int{
+	public function Delete(array $filters):int{
 		$st=$this->sql->Start()
 			->Delete()
 			->Where(self::id,$where)

@@ -14,25 +14,32 @@ class Api_PostalZoneMapping extends CDI{
 
 	public function __construct(PostalZoneMapping $pzm){
 		$this->pzm=$pzm;
-		$cid=(new ColumnDefinition(Countries::id,true,true))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get']);
-		$pzid=(new ColumnDefinition(PostalZones::id,true,true))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get']);
-		$pcid=(new ColumnDefinition(PostalCarriers::id,true,true))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get']);
-		$name=(new ColumnDefinition(Countries::name,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$c2=(new ColumnDefinition(Countries::code2,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$c3=(new ColumnDefinition(Countries::code3,true,true))->Type(self::TYPE_STRING)->Filterable(['LIKE','=','!='],['get']);
-		$r=(new ColumnDefinition(Countries::region,true,true))->Type(self::TYPE_INT)->Filterable(['='],['get']);
-		$this->AddColumnDefinition($cid);
-		$this->AddColumnDefinition($pzid);
-		$this->AddColumnDefinition($pcid);
-		$this->AddColumnDefinition($name);
-		$this->AddColumnDefinition($c2);
-		$this->AddColumnDefinition($c3);
-		$this->AddColumnDefinition($r);
+		$this->AddTransformData(Countries::region,['filter'],[$this,'TransformId']);
+		$this->AddTransformData(PostalZones::id,['filter'],[$this,'TransformId']);
 		$this->ReceiveData();
 	}
 
+	protected function TransformId($data){
+		if($data==-1)
+			return null;
+		return $data;
+	}
+
 	protected function Get(){
-		$d=$this->pzm->Get($this->columns,$this->filters,$this->order,
+		$this->Parameter(Countries::id)->Parameter(PostalZoneMapping::zoneid)->Parameter(PostalZoneMapping::carrierid)
+			->Parameter(Countries::name)->Parameter(Countries::code2)->Parameter(Countries::code3)
+			->Parameter(Countries::region);
+		
+		$this->Filter(Countries::id)->Filter(PostalZoneMapping::zoneid)->Filter(PostalZoneMapping::carrierid)
+			->Filter(Countries::name)->Filter(Countries::code2)->Filter(Countries::code3)
+			->Filter(Countries::region);
+
+		$this->Sort(Countries::id)->Sort(PostalZoneMapping::zoneid)->Sort(PostalZoneMapping::carrierid)
+			->Sort(Countries::name)->Sort(Countries::code2)->Sort(Countries::code3)
+			->Sort(Countries::region);
+		$this->Limit();
+
+		$d=$this->pzm->Get($this->parameters,$this->filters,$this->sorts,
 			$this->limit,$this->offset);
 		$this->ReturnData($d,count($d),$this->pzm->Count());
 	}
@@ -47,6 +54,10 @@ class Api_PostalZoneMapping extends CDI{
 	}
 
 	protected function Insert(){
-		$this->Return(true,$this->pzm->Insert($this->columns,$this->values));
+		$this->Value(PostalZoneMapping::countryid,true)
+			->Value(PostalZoneMapping::zoneid,true)
+			->Value(PostalZoneMapping::carrierid,true)
+			->ValidateValues();
+		$this->Return(true,$this->pzm->Insert($this->inserts,$this->values));
 	}
 }

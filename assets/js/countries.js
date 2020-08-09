@@ -21,7 +21,7 @@ export class CountriesForm extends FormController{
 
 	createForm(){
 		this.form=new Form(this.typer,'countries_');
-		this.form.setMainContainerById(C.ELEMENTS_COUNTRY_FORM)
+		this.form.setMainContainerById(C.ID_COUNTRY_FORM)
 			.startForm()
 			.add(C.COUNTRIES_NAME)
 			.add(C.COUNTRIES_CODE2)
@@ -69,7 +69,7 @@ export class CountriesTable extends DataTableController{
 	setupTable(){
 		this.table=new DataTable(this.typer,this);
 		this.table
-			.setElementsByIdObject(C.ELEMENTS_COUNTRY_TABLE)
+			.setElementsByIdObject(C.ID_COUNTRY_TABLE_ELEMENTS)
 			.addColumn(C.COUNTRIES_ID)
 			.addColumn(C.COUNTRIES_NAME)
 			.addColumn(C.COUNTRIES_CODE2)

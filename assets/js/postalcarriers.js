@@ -1,56 +1,66 @@
-import {DataTable,DataTableController} from './datatable.js';
-import {Form,FormController} from './form.js';
+import {DataTable,DataTableController,
+		DataTableToolbarButtons,
+		DataTableColumnText,
+		DataTableColumnLink,
+		DataTableColumnSelect,
+		DataTableColumnEdit,
+		DataTableToolbarNewDelete,
+		DataTableToolbarSelect,
+		DataTableToolbarSelectRows} from './datatable.js';
+import {Form,FormController, FormElementList, FormElementButtonGroup, FormElementInput} from './form.js';
 import * as C from './constants.js';
 import { CommonDataInterface } from './commondatainterface.js';
 import { DH } from './dh.js';
+import { DataProperties } from './dataproperties.js';
 
 export class PostalCarrierForm extends FormController{
 	/**
 	 * 
-	 * @param {Typer} typer 
+	 * @param {DataProperties} dp 
 	 * @param {CommonDataInterface} cdi 
 	 * @param {HTMLElement} formContainer 
 	 */
-	constructor(typer,cdi){
+	constructor(dp,cdi){
 		super();
-		this.typer=typer;
+		this.dp=dp;
 		this.cdi=cdi;
 		this.createForm();
 	}
 
 	createForm(){
-		this.form=new Form(this.typer,this);
-		this.form.addToMessageGroup(null,'PostalCarrierForm');
-		this.form.routeComponent('FormController','PostalCarrierFormController');
-		this.form.setMainContainerById(C.ELEMENTS_POSTAL_CARRIER_FORM)
+		this.form=new Form(this,'pc_');
+		this.form.setMainContainerById(C.ID_POSTAL_CARRIER_FORM)
 			.startForm()
-			.add(C.POSTAL_CARRIERS_NAME)
-			.add(C.POSTAL_CARRIERS_DESCRIPTION)
-			.addButtonGroup('buttons')
-			.addButton('submit','submit','Create','submit','buttons')
-			.addButton('reset','reset','Reset','reset','buttons')
-			.addButton('cancel','cancel','Cancel','cancel','buttons');
+			.addFormElement(new FormElementInput(C.POSTAL_CARRIERS_NAME,this.dp))
+			.addFormElement(new FormElementInput(C.POSTAL_CARRIERS_DESCRIPTION,this.dp))
+			.addFormElement(new FormElementButtonGroup()
+				.addSubmitButton('Create').addResetButton('Reset').addCancelButton('Cancel'));
 	}
 
 	async submitForm(values){
 		await this.cdi
 			.insert()
-			.columns([C.POSTAL_CARRIERS_NAME,C.POSTAL_CARRIERS_DESCRIPTION])
 			.values(values)
 			.send()
 			.catch(e=>{throw e;});
-		this.wire('PostalCarriersTable').refresh();
+		this.fromTable.refresh();
 	}
 
-	showForm(){	
+	showForm(fromTable){	
 		this.form.showComponent();
+		this.fromTable=fromTable;
 	}
 }
 
 export class PostalZonesForm extends FormController{
-	constructor(typer,cdi){
+	/**
+	 * 
+	 * @param {DataProperties} dp 
+	 * @param {CommonDataInterface} cdi 
+	 */
+	constructor(dp,cdi){
 		super();
-		this.typer=typer;
+		this.dp=dp;
 		this.cdi=cdi;
 		this.createForm();
 		this.currentId=0;
@@ -60,9 +70,9 @@ export class PostalZonesForm extends FormController{
 		this.currentId=id;
 		await this.cdi
 			.get()
-			.columns('*')
-			.where(C.POSTAL_CARRIERS_ID,this.currentId,'=')
-			.order(C.POSTAL_ZONES_NAME,C.DIRECTION_UP)
+			.parameters('*')
+			.filter(C.POSTAL_CARRIERS_ID,'=',this.currentId)
+			.sort(C.POSTAL_ZONES_NAME,C.DIRECTION_UP)
 			.send()
 			.catch(e=>{throw e});
 		let values=[];
@@ -78,41 +88,59 @@ export class PostalZonesForm extends FormController{
 		v[C.POSTAL_CARRIERS_ID]=this.currentId;
 		await this.cdi
 			.insert()
-			.columns([C.POSTAL_ZONES_NAME,C.POSTAL_CARRIERS_ID])
 			.values(v)
 			.send()
 			.catch(e=>{throw e;});
 		await this.setCurrentId(this.currentId);
-		this.wire('PostalCarriersTable').refresh();
+		this.fromTable.refresh();
+	}
+
+	async changeListItem(name,id,value){
+		await this.cdi
+			.update()
+			.set(C.POSTAL_ZONES_NAME,value)
+			.filter(C.POSTAL_ZONES_ID,'=',id)
+			.send()
+			.then(()=>this.fromTable.refresh())
+			.catch(e=>{throw e;});
+	}
+
+	async deleteListItem(name,id){
+		await this.cdi
+			.delete()
+			.filter(C.POSTAL_ZONES_ID,'=',id)
+			.send()
+			.catch(e=>{throw e;});
+		await this.setCurrentId(this.currentId);
+			this.fromTable.refresh();
 	}
 
 	createForm(){
-		this.form=new Form(this.typer,this);
-		this.form.addToMessageGroup(null,'PostalZonesForm')
-			.routeComponent('FormController','PostalZonesFormController')
-			.setMainContainerById(C.ELEMENTS_POSTAL_ZONES_FORM)
+		this.form=new Form(this,'pz_');
+		this.form.setMainContainerById(C.ID_POSTAL_ZONES_FORM)
 			.startForm()
-			.add(C.POSTAL_ZONES_NAME,'list',true)
-			.addButton('cancel','cancel','Finish','cancel');
+			.addFormElement(new FormElementList(C.POSTAL_ZONES_NAME,this.dp))
+			.addFormElement(new FormElementButtonGroup().addCancelButton('Cancel'));
 	}
 
-	showForm(){
+	showForm(fromTable){
 		this.form.showComponent();
+		this.fromTable=fromTable;
 	}
 }
 
 export class PostalZoneMappingTable extends DataTableController{
 	/**
 	 * 
-	 * @param {Typer} typer 
+	 * @param {DataProperties} dp 
 	 * @param {CommonDataInterface} regionsCdi 
 	 * @param {CommonDataInterface} zoneCdi 
 	 * @param {CommonDataInterface} zoneMapCdi 
 	 */
-	constructor(typer,regionsCdi,zoneCdi,zoneMapCdi){
+	constructor(dp,regionsCdi,zoneCdi,zoneMapCdi){
 		super();
 		this.currentId=0;
-		this.typer=typer;
+		this.dp=dp;
 		this.regionsCdi=regionsCdi;
 		this.zoneCdi=zoneCdi;
 		this.zoneMapCdi=zoneMapCdi;
@@ -122,87 +150,140 @@ export class PostalZoneMappingTable extends DataTableController{
 	async getRegions(){
 		await this.regionsCdi
 			.get()
-			.columns('*')
-			.order(C.REGION_NAME,C.DIRECTION_UP)
+			.parameters('*')
+			.sort(C.REGION_NAME,C.DIRECTION_UP)
 			.send()
 			.catch(e=>{throw e});
-		return this.regionsCdi.getData();
+		let c=this.table.getColumn(C.REGION_ID);
+		c.deleteAllOptions();
+		c.addOption(C.SELECT_NULL_ID,'{NOT SET/NULL}')
+		this.regionsCdi.getData().forEach(e=>{
+			c.addOption(e[C.REGION_ID],e[C.REGION_NAME]);
+		});
 	}
 
 	async getZones(){
 		await this.zoneCdi
 			.get()
-			.columns('*')
-			.where(C.POSTAL_CARRIERS_ID,this.currentId,'=')
-			.order(C.POSTAL_ZONES_NAME,C.DIRECTION_UP)
+			.parameters('*')
+			.filter(C.POSTAL_CARRIERS_ID,'=',this.currentId)
+			.sort(C.POSTAL_ZONES_NAME,C.DIRECTION_UP)
 			.send()
 			.catch(e=>{throw e});
-		return this.zoneCdi.getData();
+		let c=this.table.getColumn(C.POSTAL_ZONES_ID);
+		c.deleteAllOptions();
+		c.addOption(C.SELECT_NULL_ID,'{NOT SET/NULL}');
+		this.zoneCdi.getData().forEach(e=>{
+			c.addOption(e[C.POSTAL_ZONES_ID],e[C.POSTAL_ZONES_NAME]);
+		});
 	}
 
 	async refresh(){
-		this.zoneMapCdi
+		this.table.clearBody();
+		await this.zoneMapCdi
 			.get()
-			.columns('*')
-			.order(this.sort.name,this.sort.direction)
+			.parameters('*')	
+			.sort(this.sort.name,this.sort.direction)
 			.limit(this.view.size,this.view.offset)
-			.where(C.POSTAL_CARRIERS_ID,this.currentId,'=');
-		for(const k in this.filters){
-			this.zoneMapCdi.where(k,this.filters[k].comparison
-				,this.filters[k].operator);
-		}
-		await this.zoneMapCdi.send().catch(e=>{throw e});
+			.filters(this.filters,this.dp)
+			.filter(C.POSTAL_CARRIERS_ID,'=',this.currentId)
+			.send()
+			.catch(e=>{throw e});
 		this.zoneMapCdi.getData().forEach(e=>{
-
+			this.table.addRow(e[C.COUNTRIES_ID],e);
 		});
+	}
+
+	setCarrierList(list){
+		let s=this.table.getToolbarItem('currentCarrierId');
+		s.removeAllOptions();
+		list.forEach(e=>{
+			s.addOption(e[C.POSTAL_CARRIERS_ID],e[C.POSTAL_CARRIERS_NAME]);
+		});
+	}
+
+	clickToolbarButton(name){
+		this.table.hideComponent();
+		this.from.showComponent();
+	}
+
+	async changeToolbarSelect(name,value){
+		this.currentId=value;
+		await this.getZones();
+		this.refresh();
 	}
 
 	setupTable(){
-		this.table=new DataTable(this.typer,this);
+		this.table=new DataTable(this.dp,this);
 		this.table
-			.setMainContainerById(C.ELEMENTS_POSTAL_ZONE_MAPPING)
-			.setElementsByIdObject(C.ELEMENTS_POSTAL_ZONES_MAPPING_TABLE)
-			.addColumn(C.COUNTRIES_NAME)
-			.addColumn(C.COUNTRIES_CODE2)
-			.addColumn(C.COUNTRIES_CODE3)
-			.addColumn(C.REGION_ID)
-			.addColumn(C.POSTAL_ZONES_ID);
+			.setMainContainerById(C.ID_POSTAL_ZONE_MAPPING_TABLE)
+			.setContainerClass('table')
+			.setElementsByIdObject(C.ID_POSTAL_ZONES_MAPPING_TABLE_ELEMENTS)
+			.addColumn(new DataTableColumnText(C.COUNTRIES_NAME,this.dp))
+			.addColumn(new DataTableColumnText(C.COUNTRIES_CODE2,this.dp))
+			.addColumn(new DataTableColumnText(C.COUNTRIES_CODE3,this.dp))
+			.addColumn(new DataTableColumnSelect(C.REGION_ID,this.dp,true,true,false,true))
+			.addColumn(new DataTableColumnSelect(C.POSTAL_ZONES_ID,this.dp,true,true,true,false))
+			.addToolbarItem(new DataTableToolbarButtons().addButton('finish','Finish Mapping'))
+			.addToolbarItem(new DataTableToolbarSelect('currentCarrierId'))
+			.addToolbarItem(new DataTableToolbarSelectRows('selectRows',true,true,false));
+	}
+
+	async showTable(id,from){
+		this.currentId=id;
+		await this.getRegions();
+		await this.getZones();
+		from.hideComponent();
+		this.from=from;
 		this.table.setViewSize(50);
 		this.table.setSort(C.COUNTRIES_NAME,C.DIRECTION_UP);
+		this.table.showComponent();
 	}
 
-	updateTyper(regions,zones){
-		this.typer.resetListOptions(C.REGION_ID);
-		this.typer.resetListOptions(C.POSTAL_ZONES_ID);
-		regions.forEach(e=>{
-			this.typer.addListOption(C.REGION_ID,e[C.REGION_ID],e[C.REGION_NAME])
-		});
-		zones.forEach(e=>{
-			this.typer.addListOption(C.POSTAL_ZONES_ID,e[C.POSTAL_ZONES_ID],e[C.POSTAL_ZONES_NAME]);
-		})
+	async changeMultipleCellValue(rowIds,name,value){
+		if(name==C.POSTAL_ZONES_ID){
+			this.zoneMapCdi
+				.insert()
+			rowIds.forEach(e=>{
+				let v={};
+				v[C.POSTAL_CARRIERS_ID]=this.currentId;
+				v[C.COUNTRIES_ID]=e;
+				v[C.POSTAL_ZONES_ID]=value;
+				this.zoneMapCdi.values(v);
+			});
+			await this.zoneMapCdi
+				.send()
+				.catch(e=>{throw e;});
+		}
 	}
 
-	async showTable(id){
-		this.currentId=id;
-		let regions=await this.getRegions();
-		let zones=await this.getZones();
-		this.updateTyper(regions,zones);
-		this.setupTable();
+	async changeCellValue(rowId,name,value){
+		if(name==C.POSTAL_ZONES_ID){
+			let v={};
+			v[C.POSTAL_CARRIERS_ID]=this.currentId;
+			v[C.COUNTRIES_ID]=rowId;
+			v[C.POSTAL_ZONES_ID]=value;
+			await this.zoneMapCdi
+				.insert()
+				.values(v)
+				.send()
+				.catch(e=>{throw e;});
+		}
 	}
 }
 
 export class PostalCarriersTable extends DataTableController{
 	/**
 	 * Constructor.
-	 * @param {Typer} typer 
+	 * @param {DataProperties} dp 
 	 * @param {CommonDataInterface} cdi 
 	 * @param {PostalCarrierForm} pcForm
 	 * @param {PostalZonesForm} pzForm
 	 * @param {pzTable} pzmTable
 	 */
-	constructor(typer,cdi,pcForm,pzForm,pzmTable=null){
+	constructor(dp,cdi,pcForm,pzForm,pzmTable=null){
 		super();
-		this.typer=typer;
+		this.dp=dp;
 		this.cdi=cdi;
 		this.pcForm=pcForm;
 		this.pzForm=pzForm;
@@ -211,82 +292,77 @@ export class PostalCarriersTable extends DataTableController{
 	}
 
 	setupTable(){
-		this.table=new DataTable(this.typer,this);
+		this.table=new DataTable(this.dp,this);
 		this.table
-			.setElementsByIdObject(C.ELEMENTS_POSTAL_CARRIER_TABLE)
-			.addColumn(C.POSTAL_CARRIERS_ID,true,false)
-			.addColumn(C.POSTAL_CARRIERS_NAME,true,false)
-			.addColumn(C.POSTAL_CARRIERS_DESCRIPTION,true,false)
-			.addLinkColumn(C.POSTAL_ZONES_NAME)
-			.addLinkColumn(C.POSTAL_CARRIERS_MAPPING)
-			.addToolbarItem('custom',C.UI_CREATE_GLYPH,'create')
-			.addToolbarItem('delete',String.fromCodePoint(0x1F5D1),'delete');
+			.setMainContainerById(C.ID_ELEMENTS_POSTAL_CARRIER_TABLE)
+			.setContainerClass('table')
+			.setElementsByIdObject(C.ID_POSTAL_CARRIER_TABLE_ELEMENTS)
+			.addColumn(new DataTableColumnText(C.POSTAL_CARRIERS_ID,this.dp,true,false))
+			.addColumn(new DataTableColumnEdit(C.POSTAL_CARRIERS_NAME,this.dp,true,false))
+			.addColumn(new DataTableColumnEdit(C.POSTAL_CARRIERS_DESCRIPTION,this.dp,true,false))
+			.addColumn(new DataTableColumnLink(C.POSTAL_ZONES_NAME,this.dp,true,false))
+			.addColumn(new DataTableColumnLink(C.POSTAL_CARRIERS_MAPPING,this.dp,true,false))
+			.addToolbarItem(new DataTableToolbarNewDelete('new/delete'));
 		this.table.setViewSize(50);
 		this.table.setSort(C.POSTAL_CARRIERS_NAME,C.DIRECTION_UP);
 	}
 
 	async refresh(){
-		this.cdi
-			.get()
-			.columns('*')
-			.order(this.sort.name,this.sort.direction)
-			.limit(this.view.size,this.view.offset*this.view.size);
-		for(const k in this.filters){
-			let value;
-			if(this.filters[k].comparison==C.SELECT_NULL_ID){
-				value=null;
-			}
-			else{
-				value=this.filters[k].comparison;
-			}
-			this.cdi.where(k,value,this.filters[k].operator);
-		}
 		await this.cdi
+			.get()
+			.parameters('*')
+			.sort(this.sort.name,this.sort.direction)
+			.limit(this.view.size,this.view.offset*this.view.size)
+			.filters(this.filters,this.dp)
 			.send()
 			.catch(e=>{throw e});
 		this.table.clearBody();
 		this.cdi.getData().forEach(r => {
 			if(r[C.POSTAL_ZONES_NAME]==null)
 				r[C.POSTAL_ZONES_NAME]='{NOT SET}';
+			else{
+				r[C.POSTAL_ZONES_NAME]=JSON.parse(r[C.POSTAL_ZONES_NAME]).join(', ');
+			}
 			r[C.POSTAL_CARRIERS_MAPPING]='Map Zones';
 			this.table.addRow(r[C.POSTAL_CARRIERS_ID],r);
 		});
 		this.table.renderFoot(this.cdi.getTotalSize());
+		this.pzmTable.setCarrierList(this.cdi.getData());
 	}
 
-	async change(rowId,name,value){
+	async changeCellValue(rowId,name,value){
 		await this.cdi
 			.update()
 			.set(name,value)
-			.where(C.POSTAL_CARRIERS_ID,rowId,'=')
+			.filter(C.POSTAL_CARRIERS_ID,'=',rowId)
 			.send()
 			.catch(e=>{throw e});
 		this.refresh();
 	}
 
-	async delete(ids){
+	async deleteRows(ids){
 		if(confirm('Do you want to delete selected carriers ('+ids.length+')')){
 			await this.cdi
 				.delete()
-				.where(C.POSTAL_CARRIERS_ID,ids,'IN')
+				.filter(C.POSTAL_CARRIERS_ID,'IN',ids)
 				.send()
+				.then(()=>this.refresh())
 				.catch(e=>{throw e});
-			this.refresh();
 		}
 	}
 
-	clickCustomButton(name){
+	createRow(name){
 		if(name=='create');
-			this.pcForm.showForm();
+			this.pcForm.showForm(this);
 	}
 
-	async clickLink(name,id,value){
+	async clickLink(name,id){
 		if(name==C.POSTAL_ZONES_NAME){
 			await this.pzForm.setCurrentId(id);
-			this.pzForm.showForm();
+			this.pzForm.showForm(this);
 		}
 		else if(name==C.POSTAL_CARRIERS_MAPPING){
-			await this.pzmTable.showTable(id);
+			await this.pzmTable.showTable(id,this.table);
 		}
 	}
 }

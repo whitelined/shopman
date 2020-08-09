@@ -16,16 +16,15 @@
  */
 namespace Meerkat\Core;
 
+use Lib\Countries;
+
 abstract class CommonDataInterface{
 	const SORT_ASC='ASC';
 	const SORT_DESC='DESC';
 	const TYPE_ANY=0;
-	const TYPE_INT=1;
-	const TYPE_DECIMAL=2;
-	const TYPE_NUMBER=3;
-	const TYPE_STRING=4;
-	const TYPE_ARRAY=5;
-	const TYPE_PARSER=7;
+	const TYPE_INTEGER='integer';
+	const TYPE_DECIMAL='decimal';
+	const TYPE_TEXT='text';
 
 	const ERROR_CLIENT_INVALID_REQUEST_TYPE=1;
 	const ERROR_CLIENT_MALFORMED_JSON=2;
@@ -38,6 +37,8 @@ abstract class CommonDataInterface{
 	const ERROR_CLIENT_COLUMNS_NOT_DEFINED=9;
 	const ERROR_CLIENT_SET_NOT_DEFINED=10;
 	const ERROR_CLIENT_VALUES_NOT_DEFINED=11;
+	const ERROR_CLIENT_LIMIT_NOT_DEFINED=12;
+	const ERROR_CLIENT_PARAMETER_NOT_REQUIRED=12;
 	const ERROR_SERVER_EMPTY_WHERE_OPERATORS=1001;
 	const ERROR_SERVER_UPDATE_NOT_PERFORMED=1002;
 
@@ -50,14 +51,16 @@ abstract class CommonDataInterface{
 	private $data=null;
 
 	protected $action=null;
-	protected $sets;
-	protected $definitions=[];
-	protected $order=[];
+	protected $transforms=[];
+	protected $sets=[];
+	protected $parameters=[];
+	protected $filters=[];
+	protected $sorts=[];
+	protected $inserts=[];
+	protected $values=[];
+	protected $insertDefinitions=[];
 	protected $limit=-1;
 	protected $offset=-1;
-	protected $filters=[];
-	protected $columns;
-	protected $values;
 
 
 	private function SetContentType(){
@@ -66,81 +69,67 @@ abstract class CommonDataInterface{
 
 	/**
 	 * Checks data against column type. If operator is present, detects if array is for 'IN'
-	 * @param  string $name     Name of column
-	 * @param  mixed  $data     Data to check against
+	 * @param array $definition Definition containing 'name','type','source'
+	 * @param  mixed  $value     Data to check against
 	 * @param  string $operator Optional operator, to check special cases.
 	 * @return bool             Returns true if ok, false otherwise.
 	 */
-	private function CheckType(string $name,&$data,string $operator=null):bool{
-		if($operator=='IN'&&is_array($data)){
-			foreach($data as $v){
-				if(!$this->CheckType($name,$v))
-					return false;
+	private function CheckType($definition,$value,$operator=''):bool{
+		if($operator=='IN'||$operator=='NOT IN'){
+			if(is_array($value)){
+				foreach($value as $v){
+					if(is_array($v)||!$this->CheckType($definition,$v)){
+						return false;
+					}
+				}
+				return true;
 			}
+			else
+			{
+				return false;
+			}
+		}
+		if($value==null){
 			return true;
 		}
-		switch($this->definitions[$name]->type){
-			case self::TYPE_ANY:
-				return true;
-			case self::TYPE_INT:
-				if(filter_var($data,FILTER_VALIDATE_INT)===false&&$data!==null){
-					return false;
-				}
-				return true;
-			case self::TYPE_NUMBER:
+		switch($definition['type']){
+			case self::TYPE_TEXT:
+				if(is_string($value))
+					return true;
+				return false;
+			case self::TYPE_INTEGER:
+				if(filter_var($value,FILTER_VALIDATE_INT)!==false)
+					return true;
+				return false;
 			case self::TYPE_DECIMAL:
-				if(is_numeric($data)||$data==null){
+				if(is_numeric($value))
 					return true;
-				}
 				return false;
-			case self::TYPE_STRING:
-				if(is_string($data)||$data==null){
-					return true;
-				}
-				return false;
-			case self::TYPE_ARRAY:
-				if(is_array($data)){
-					return true;
-				}
-				return false;
-			case self::TYPE_PARSER:
-				if($this->definitions[$name]->parser($data)){
-					return true;
-				}
-				return false;
-		}
-	}
-
-	private function CheckComparisonOperator(string $op,array $list):bool{
-		if(in_array($op,$list))
-			return true;
+		}		
 		return false;
 	}
 
-	private function ProcessGet(){
-		$this->Columns();
-		$this->Where();
-		$this->Order();
-		$this->Limit();
-		$this->Get();
+	private function TransformData($definition,$action,$value){
+		foreach($this->transforms as $v){
+			if($v[0]==$definition){
+				if(!in_array($action,$v[1]))
+					return $value;
+				return $v[2]($value);
+			}
+		}
+		return $value;
 	}
 
-	private function ProcessUpdate(){
-		$this->Set();
-		$this->Where();
-		$this->Limit();
-		$this->Update();
-	}
-
-	private function ProcessInsert(){
-		$this->Columns();
-		$this->Values();
-		$this->Insert();
-	}
-
-	private function ProcessDelete(){
-		$this->Where();
-		$this->Delete();
+	/**
+	 * Adds a callback that transform data 
+	 *
+	 * @param array $definition Definition, where, if matches, callback is called.
+	 * @param array $where Where to transform data, array values one or more of 'set','insert' or 'filter'
+	 * @param callable $callback Function that takes value as parameter, and returns transformed value.
+	 * @return void
+	 */
+	protected function AddTransformData(array $definition,array $where,$callback){
+		$this->transforms[]=[$definition,$where,$callback];
 	}
 
 	protected function Return(bool $ok=true,int $queryStatus=self::QUERY_OK){
@@ -172,10 +161,6 @@ abstract class CommonDataInterface{
 		throw new CommonDataInterfaceError($text,$code);
 	}
 	
-	protected function AddColumnDefinition(ColumnDefinition $cd){
-		$this->definitions[$cd->name]=$cd;
-	}
-
 	protected function ReceiveData(){
 		$this->SetContentType();
 		$this->contentType=$_SERVER['CONTENT_TYPE']??null;
@@ -195,177 +180,276 @@ abstract class CommonDataInterface{
 		$this->action=$this->data['action'];
 		switch($this->action){
 			case 'get':
-				$this->ProcessGet();
+				$this->Get();
 				break;
 			case 'update':
-				$this->ProcessUpdate();
+				$this->Update();
 				break;
 			case 'insert':
-				$this->ProcessInsert();
+				$this->Insert();
 				break;
 			case 'delete':
-				$this->ProcessDelete();
+				$this->Delete();
 				break;
 		}
 		return true;
 	}
 
-	/**
-	 * Checks set definitions
-	 *
-	 * @return void
-	 */
-	protected function Set(){
-		$this->sets=[];
-		if(!isset($this->data['set'])||count($this->data['set'])<1){
-			$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
-				"Set not defined for action '{$this->action}'.");
+	private function CheckFilter($definition,$filter,$operators){		
+		if(count($filter)!=3){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,"Filter not defined correctly.");
 		}
-		foreach($this->data['set'] as $k=>$v){
-			$value=($this->definitions[$k]->dataTransformer)($v);
-			if($this->CheckType($k,$value)){
-				$this->sets[$k]=$value;
-			}
-			else{
-				$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
-					"Incompatible type for '$k'.");
-			}
+		if($filter[0]!=$definition['name'])
+			return false;
+		if(count($operators)>0&&!in_array($filter[1],$operators)){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+				"Operator '{$filter[1]}' not allowed for filter {$definition['name']}");
 		}
+		if(!$this->CheckType($definition,$filter[2],$filter[1])){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+				"Filter (type: {$definition['type']}) {$definition['name']} has incompatible data format.");
+		}
+		return true;
+	}
+
+	private function CheckSort($definition,$sort){
+		if(count($sort)!=2){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+				"Sort not defined correctly.");
+		}
+		if($sort[1]!=self::SORT_ASC&&$sort[1]!=self::SORT_DESC){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+				"Sort not defined correctly.");
+		}
+		if($sort[0]==$definition['name'])
+			return true;
+		return false;
 	}
 
 	/**
-	 * Checks columns against list that can be used in request
+	 * Checks parameter isn't empty - has at least one entry.
+	 *
+	 * @return CommonDataInterface Returns this for chaining.
 	 */
-	protected function Columns(){
-		$this->columns=[];
-		switch($this->action){
-			case 'get':
-				$p='selectable';
-				break;
-			case 'update':
-				$p='updatable';
-				break;
-			case 'insert':
-				$p='insertable';
-				break;
+	protected function ParameterNotEmpty():CommonDataInterface{
+		if(count($this->parameters)<1)
+			$this->ReturnError(self::ERROR_CLIENT_PARAMETER_NOT_REQUIRED,
+			"No parameters defined, required.");
+		return $this;
+	}
+
+	/**
+	 * Checks for requested parameter
+	 *
+	 * @param array $definition Definition containing 'name','type','source'
+	 * @param boolean $isRequired Set to true if it's required.
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function Parameter(array $definition,bool $isRequired=false):CommonDataInterface{
+		if(!isset($this->data['parameters'])){
+			$this->ReturnError(self::ERROR_CLIENT_PARAMETER_NOT_REQUIRED,
+				"No parameters not defined, required.");
 		}
-		if(!isset($this->data['columns'])&&!is_array($this->data['columns'])){
-				$this->ReturnError(self::ERROR_CLIENT_COLUMNS_NOT_DEFINED,
-				"Columns not set or is not a string or not an array.");
+		if(is_string($this->data['parameters'])&&$this->data['parameters']=='*'){
+			$this->parameters[$definition['name']]=$definition;
+		}
+		else if(is_array($this->data['parameters'])){
+			foreach($this->data['parameters'] as $k=>$v){
+				if($v==$definition['name']){
+					$this->parameters[$definition['name']]=$definition;
+					unset($this->data['parameters'][$k]);
+					return $this;
+				}
 			}
-		if(count($this->data['columns'])==1&&$this->data['columns'][0]=='*'){
-			foreach($this->definitions as $v){
-				if($v->{$p}){
-					$this->columns[]=$v->name;
+			if($isRequired){
+				$this->ReturnError(self::ERROR_CLIENT_PARAMETER_NOT_REQUIRED,
+					"Parameter {$definition['name']} not found in request");
+			}
+		}
+		else{
+			$this->ReturnError(self::ERROR_CLIENT_PARAMETER_NOT_REQUIRED,
+				"Parameters defined as unknown data type.");
+		}
+		return $this;
+	}
+
+	/**
+	 * Checks set isn't empty.
+	 *
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function SetNotEmpty():CommonDataInterface{
+		if(count($this->sets)<1){
+			$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
+				"No sets defined, required.");
+		}
+		return $this;
+	}
+
+	/**
+	 * Checks for requested parameter
+	 *
+	 * @param array $definition Definition containing 'name','type','source'
+	 * @param boolean $isRequired Set to true if it's required.
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function Set(array $definition,$isRequired=false):CommonDataInterface{
+		if(!isset($this->data['set'])&&$isRequired){
+			$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
+				"No sets defined at all, required.");
+		}
+		if(isset($this->data['set'])){
+			foreach($this->data['set'] as $k=>$v){
+				if(count($v)!=2){
+					$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
+					"Set not defined correctly.");
+				}
+				if($v[0]==$definition['name']){
+					if($this->CheckType($definition,$v[1])){
+						$v[1]=$this->TransformData($definition,'set',$v[1]);
+						$this->sets[$definition['name']]=[$definition,$v[1]];
+						unset($this->data['set']);
+						return $this;
+					}
+				}
+			}
+			if($isRequired){
+				$this->ReturnError(self::ERROR_CLIENT_SET_NOT_DEFINED,
+					"Set {$definition['name']} not defined, required.");
+			}
+		}
+		return $this;
+	}
+
+	/**
+	 * Checks filter isn't empty - has at least one entry.
+	 *
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function FilterNotEmpty():CommonDataInterface{
+		if(count($this->filters)<1)
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+			"No filters defined, required.");
+		return $this;
+	}
+
+	/**
+	 * Checks for filter
+	 *
+	 * @param array $definition Definition containing 'name','type','source'
+	 * @param boolean $isRequired Set to true if it's required.
+	 * @param array $operators Optional set of allowed operators 
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function Filter(array $definition,bool $isRequired=false,array $operators=[]):CommonDataInterface{
+		if(!isset($this->data['filters'])&&$isRequired){
+			$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+				"No filters defined at all.");
+		}
+		if(isset($this->data['filters'])){
+			foreach($this->data['filters'] as $k=>$v){
+				if($this->CheckFilter($definition,$v,$operators)){
+					$v[2]=$this->TransformData($definition,'filter',$v[2]);
+					$this->filters[$definition['name']]=[$definition,$v[1],$v[2]];
+					unset($this->data['filters'][$k]);
+					return $this;
 				}
 			}
 		}
 		else{
-			foreach($this->data['columns'] as $v){
-				if(!isset($this->definitions[$v])){
-					$this->ReturnError(self::ERROR_CLIENT_COLUMNS_NOT_DEFINED,
-						"'$v' column not defined.");
-				}
-				if($this->definitions[$v]->{$p}){
-					$this->columns[]=$v;
-				}
-				else{
-					$this->ReturnError(self::ERROR_CLIENT_COLUMNS_NOT_DEFINED,
-						"Column '$v' does not support action '{$this->action}'.");
-				}
+			if($isRequired){
+				$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+					"Filter {$definition['name']} is missing.");
 			}
 		}
+		return $this;
 	}
 
 	/**
-	 * Checks values for insert request.
+	 * Checks for sorting
 	 *
-	 * @return void
+	 * @param array $definition Definition containing 'name','type','source'
+	 * @param boolean $isRequired Set to true if it's required.
+	 * @return CommonDataInterface Returns this for chaining.
 	 */
-	protected function Values(){
-		$rows=[];
-		if(!isset($this->data['values'])||!is_array($this->data['values'])){
-			$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
-				"'values' not defined or not array.");
-		}
-		foreach($this->data['values'] as $v){
-			foreach($v as $k2=>$v2){
-				if(!in_array($k2,$this->columns)){
-					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
-						"Value '{$k2}' not defined in column.");
+	protected function Sort(array $definition,bool $isRequired=false):CommonDataInterface{
+		if(isset($this->data['sort'])){
+			if(is_array($this->data['sort'])){
+				foreach($this->data['sort'] as $k=>$v){
+					if($this->CheckSort($definition,$v)){
+						$this->sorts[$definition['name']]=$v;
+						unset($this->data['sort'][$k]);
+						return $this;
+					}
 				}
-				$v[$k2]=($this->definitions[$k2]->dataTransformer)($v[$k2]);
-				if(!$this->CheckType($k2,$value)){
-					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
-					"Value for '{$k2}' not valid.");
+				if($isRequired){
+					$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+					"Sort {$definition['name']} not defined, required.");
 				}
-			}
-			$rows[]=$v;
-		}
-		$this->values=$rows;
-	}
-
-	/**
-	 * Checks ordering requests match allowed order columns.
-	 */
-	protected function Order(){
-		if(!isset($this->data['order']))
-			return;
-		foreach($this->data['order'] as $v){
-			if(!isset($v['by'],$v['direction'])&&$v['direction']!=self::SORT_ASC&&
-				$v['direction']!=self::SORT_DESC){
-				$this->ReturnError(self::ERROR_CLIENT_ORDER_NOT_DEFINED,
-					"'by' and/or 'direction' not defined in array, or 'direction' ill-defined.");
-			}
-			if(isset($this->definitions[$v['by']])&&
-				$this->definitions[$v['by']]->orderable){
-				$this->order[$v['by']]=$v['direction'];
 			}
 			else{
-				$this->ReturnError(self::ERROR_CLIENT_ORDER_NOT_DEFINED,
-					"Invalid column to order by '{$v['by']}'");
+				$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
+					"Sort not defined correctly, should be an array.");
 			}
 		}
-		unset($this->data['order']);
+		return $this;
 	}
 
 	/**
-	 * Checks for any required or optional where clauses, and validates them.
+	 * Adds a value definition
+	 *
+	 * @param array $definition Column definition.
+	 * @param boolean $isRequired Is this value required.
+	 * @return CommonDataInterface Returns this for chaining.
 	 */
-	protected function Where(){
-		if(isset($this->data['filters'])&&is_array($this->data['filters'])){
-			foreach($this->data['filters'] as $k=>$v){
-				if($this->definitions[$k]->filterRestrictions&&
-					!in_array($this->action,$this->definitions[$k]->filterRestrictions)){
-					$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
-						"'$k' filter not allowed for this action '{$this->action}'.");
-				}
-				if(isset($this->definitions[$k])&&
-					$this->definitions[$k]->filterable){
-					if(isset($v['operator'])){
-						if(!$this->CheckComparisonOperator($v['operator'],
-							$this->definitions[$k]->operators)){
-							$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
-								"Invalid operator {$v['operator']} for '$k'.");
-						}
-						$value=($this->definitions[$k]->dataTransformer)($v['comparison']);
-						if(!$this->CheckType($k,$value,$v['operator'])){
-							$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
-								"Comparison '{$value}' incompatible with column {$k} type.");
-						}
-						$v['comparison']=$value;	
-						$this->filters[$k]=$v;
+	protected function Value(array $definition,$isRequired=false):CommonDataInterface{
+		$this->insertDefinitions[$definition['name']]=[$definition,$isRequired];
+		return $this;
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function ValidateValues():CommonDataInterface{
+		if(!isset($this->data['values'])){
+			$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
+				"Values not defined.");
+		}
+		foreach($this->data['values'] as $v){
+			foreach($this->insertDefinitions as $v2){
+				if(isset($v[$v2[0]['name']])){
+					if(!$this->CheckType($v2[0],$v[$v2[0]['name']])){
+						$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
+							"Invalid data type ({$v2[0]['type']}) for {$v2[0]['name']}.");
 					}
 				}
 				else{
-					$this->ReturnError(self::ERROR_CLIENT_FILTER_NOT_DEFINED,
-					"Filter '$k' not defined, or not filterable.");
+					if($v2[1])
+						$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
+							"Values {$v2[0]['name']} not defined, required.");
 				}
 			}
+			foreach($v as $k2=>$v2){
+				if(!isset($this->insertDefinitions[$k2])){
+					$this->ReturnError(self::ERROR_CLIENT_VALUES_NOT_DEFINED,
+						"Value {$k2} not recognized.");
+				}
+				$this->inserts[$k2]=$this->insertDefinitions[$k2][0];
+			}
 		}
+		$this->values=$this->data['values'];
+		return $this;
 	}
 
-	protected function Limit(){
+	/**
+	 * Checks for limit and offset.
+	 *
+	 * @param boolean $isRequired Is a limit and offset required.
+	 * @return CommonDataInterface Returns this for chaining.
+	 */
+	protected function Limit(bool $isRequired=false):CommonDataInterface{
 		if(isset($this->data['limit'])&&is_int($this->data['limit'])){
 			$this->limit=$this->data['limit'];
 		}
@@ -378,6 +462,11 @@ abstract class CommonDataInterface{
 		else{
 			$this->offset=-1;
 		}
+		if($isRequired&&($this->limit==-1||$this->offset==-1)){
+			$this->ReturnError(self::ERROR_CLIENT_LIMIT_NOT_DEFINED,
+				"Limit and offset not defined, required");
+		}
+		return $this;
 	}
 
 	abstract protected function Get();

@@ -1,73 +1,42 @@
 export class Component{
-	static currentMessageGroup='default';
-	static messageGroups={};
 	static stack=1;
 
 	static containerClasses={
-		table:{show:'table-container show',hide:'table-container'},
-		form:{show:'blankout show',hide:'blankout'}
+		table:{show:'table-container',hide:'table-container hide'},
+		form:{show:'blankout',hide:'blankout hide'}
 	};
 
-	constructor(autoAdd=true,aliasFor=null){
-		this.messageRoutes={};
-		this.messageGroup='default';
+	constructor(){
 		this.mainContainer=null;
+		this.containerClass='form';
 		this.elements={};
 		this.classNames={};
 		this.expecting={elements:{},classNames:{}};
-		this.addToMessageGroup(null,aliasFor);
+	}
+
+	setContainerClass(name){
+		this.containerClass=name;
+		return this;
 	}
 
 	hideComponent(){
-		this.mainContainer.className=Component.hideClass;
+		this.mainContainer.className=Component.containerClasses[this.containerClass].hide;
+		return this;
 	}
 	
 	showComponent(){
-		this.mainContainer.className=Component.showClass;
-	}
-
-	static addContainerClass(){
-
-	}
-
-	/**
-	 * Adds this object to a message group
-	 * @param {string} name The name of the message group if set, or uses currently set one.
-	 * @param {string} asAlias Add it as this alias if set, or uses this name.
-	 */
-	addToMessageGroup(name=null,asAlias=null){
-		let n=name;
-		if(!n)
-			n=Component.currentMessageGroup;
-		if(n in Component.messageGroups==false){
-			Component.messageGroups[n]={}
-		}
-		this.messageGroup=n;
-		Component.messageGroups[n][(asAlias=null)?this.constructor.name:asAlias]=this;
+		this.mainContainer.className=Component.containerClasses[this.containerClass].show;
 		return this;
 	}
 
 	/**
-	 * Routes a component request from this object to another
-	 * @param {string} from The component this object requests.
-	 * @param {string} to The name of component to route to.
+	 * Adds a container classes.
+	 * @param {string} name Name of container classes.
+	 * @param {string} show Name of show class.
+	 * @param {string} hide Name of hide class.
 	 */
-	routeComponent(from,to){
-		this.messageRoutes[from]=to;
-		return this;
-	}
-
-	/**
-	 * Returns named component for communication.
-	 * @param {string} name 
-	 * @returns {Component}
-	 */
-	wire(name){
-		let n=name;
-		if(n in this.messageRoutes){
-			n=this.messageRoutes[n];
-		}
-		return Component.messageGroups[this.messageGroup][n];
+	static addContainerClass(name,show,hide){
+		Component.containerClasses[name]={show:show,hide:hide};
 	}
 
 	/**

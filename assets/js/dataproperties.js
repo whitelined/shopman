@@ -6,8 +6,9 @@ import {DH} from './dh.js';
 export const TYPE_INT='integer';
 export const TYPE_STRING='string';
 export const TYPE_REGEX='regex';
+export const TYPE_OTHER='other';
 
-export class Typer{
+export class DataProperties{
 	constructor(){
 		this.definitions={};
 	}
@@ -168,9 +169,7 @@ export class Typer{
 	 * Add validation of string.
 	 * @param {string} name Alias of comparison 
 	 * @param {string} dataName name of data type. Set to false to use alias 'name'.
-	 * @param {string} defaultValue Default value.
 	 * @param {string} prompt Prompt text to use.
-	 * @param {boolean} readOnly Sets type as a read only value.
 	 * @param {string} error Description of what value needs to be
 	 * @param {int} minLength min length of string.
 	 * @param {int} maxLength max length of string.
@@ -216,5 +215,21 @@ export class Typer{
 		if(this.definitions[name].regex.test(value))
 			return true;
 		return false;
+	}
+
+	/**
+	 * Add other type.
+	 * @param {string} name Alias of comparison 
+	 * @param {string} dataName name of data type. Set to false to use alias 'name'.
+	 * @param {string} prompt Prompt text to use.
+	 * @param {string} error Description of what value needs to be
+	 */
+	addOther(name,dataName,prompt,error=null){
+		this.definitions[name]={
+			dataName:(!dataName)?name:dataName,
+			prompt:prompt,
+			error:error
+		};
+		return this;
 	}
 }

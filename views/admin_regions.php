@@ -1,17 +1,17 @@
 <?php
-$this->AddTemplate('admin_top');
+$this->AddTemplate('top');
 ?>
 
 <div id="region_form" class="blankout">
 </div>
 
 <table class="datatable">
-<thead id="admin_regions_thead"></thead>
-<tbody id="admin_regions_tbody"></tbody>
-<tfoot id="admin_regions_tfoot"></tfoot>
+<thead id="regions_thead"></thead>
+<tbody id="regions_tbody"></tbody>
+<tfoot id="regions_tfoot"></tfoot>
 </table>
 
-<script src="/assets/js/admin_regions.js" type="module" defer></script>
+<script src="/assets/js/regions.js" type="module" defer></script>
 
 <?php
-$this->AddTemplate('admin_bottom');
+$this->AddTemplate('bottom');

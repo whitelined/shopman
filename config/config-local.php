@@ -16,3 +16,4 @@ const local_webojects='/home/aaron/shopman/content/webobjects/';
 const local_views='/home/aaron/shopman/views/';
 const local_templates='/home/aaron/shopman/templates/';
 const local_data='/home/aaron/shopman/data/';
+const local_sql_dump='/home/aaron/shopman/sql.log';

@@ -3,5 +3,5 @@ import {PostageTyper} from './postagetyper.js';
 import {PostageTable} from './postagetable.js';
 
 let pCDI=new CommonDataInterface('Postage','/api/Postage');
-let pTyper=new PostageTyper();
+let pTyper=new PostageDataProperties();
 let pTable=new PostageTable(pTyper,pCDI);

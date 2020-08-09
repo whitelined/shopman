@@ -7,19 +7,19 @@ use \Meerkat\Core\CommonDataInterface as CDI;
 class Countries extends TypicalDataInterface{
 	public const schema='shopman';
 	public const table='countries';
-	public const id='country_id';
-	public const name='country_name';
-	public const code2='code_2';
-	public const code3='code_3';
-	public const region='region_id';
+	public const id=['name'=>'country_id','type'=>'integer','table'=>self::table];
+	public const name=['name'=>'country_name','type'=>'text','table'=>self::table];
+	public const code2=['name'=>'code_2','type'=>'text','table'=>self::table];
+	public const code3=['name'=>'code_3','type'=>'text','table'=>self::table];
+	public const region=['name'=>'region_id','type'=>'integer','table'=>self::table];
 	
 	public function __construct(\PDO $db){
-		$this->Init($db,[self::id=>'integer',self::name=>'text',self::code2=>'text',
-			self::code3=>'text',self::region=>'integer'],self::id,self::table,
+		$this->Init($db,[self::id,self::name,self::code2,
+			self::code3,self::region,self::id],self::id,self::table,
 			self::schema);
 	}
 
-	public function Get(array $columns,array $where,array $order,int $limit=-1,int $offset=-1):array{
+	public function Get(array $parameters,array $filters,array $order,int $limit=-1,int $offset=-1):array{
 		if(($p=array_search(self::region,$columns))!==false){
 			$columns[$p]="COALESCE (".self::region.",-1) as ".self::region;
 		}

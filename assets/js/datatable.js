@@ -1,7 +1,7 @@
 import {DH} from './dh.js';
 import {Component} from './component.js';
 import * as C from './constants.js';
-import * as T from './typer.js';
+import {DataProperties} from './dataproperties.js';
 const DEFAULT_SELECT_SEARCH_VALUE='..search..';
 const SEARCH_DELAY=300;
 
@@ -13,12 +13,12 @@ export const COLUMN_LINK='link';
 
 export class DataTable extends Component{
 	/**
-	 * @param {Typer} typer
-	 * @param {DataTableController} controller
+	 * @param {dp} dp
+	 * @param {DataProperties} controller
 	 */
-	constructor(typer,controller){
+	constructor(dp,controller){
 		super();
-		this.typer=typer;
+		this.dp=dp;
 		this.controller=controller;
 		this.columns=[];
 		this.currentSort=null;
@@ -34,11 +34,6 @@ export class DataTable extends Component{
 		this.expectingElement('thead','Table Head',true,null)
 			.expectingElement('tbody','Table body',true,null)
 			.expectingElement('tfoot','Table foot',true,null)
-			.expectingElement('up','Sort up arrow.',false,DH.newWithText('span','\u21E7'))
-			.expectingElement('down','Sort down arrow.',false,DH.newWithText('span','\u21E9'))
-			.expectingElement('search','Search.',false,DH.newWithText('span',String.fromCodePoint(0x1F50D)))
-			.expectingClassName('searchButton','',false,'search-button')
-			.expectingClassName('searchOutline','',false,'search-outline')
 			.expectingClassName('titleClass','',false,'search-button')
 			.expectingClassName('row1','Row 1 style.',false,'datatable row1')
 			.expectingClassName('row2','Row 2 style.',false,'datatable row2')
@@ -49,6 +44,11 @@ export class DataTable extends Component{
 	setSort(name,direction){
 		this.currentSort=name;
 		this.currentDirection=direction;
+		this.columns.forEach(e=>{
+			if(e.getName()!=name){
+				e.setSort(false,direction);
+			}
+		});
 		this.controller.setSort(name,direction);
 		this.renderHead();
 		this.controller.refresh();
@@ -62,7 +62,7 @@ export class DataTable extends Component{
 	setFilters(){
 		let filters={};
 		for(const k in this.searches){
-			let dataName=this.typer.getDataName(k);
+			let dataName=this.dp.getDataName(k);
 			let c=this.findColumn(k);
 			switch(c.type){
 				case COLUMN_TEXT:
@@ -86,133 +86,54 @@ export class DataTable extends Component{
 	}
 
 	/**
-	 * Sets a toolbar select list's options
-	 * @param {string} name Name of toolbar select element.
-	 * @param {array} options Array of objects containing 'value' and COLUMN_TEXT.
-	 * @param {string} name Name of value to be selected.
+	 * Adds a item to the toolbar.
+	 * @param {DataTableToolbarItem} item Adds toolbar item.
 	 */
-	setToolbarSelectList(name,options,selected=null){
-		let r=this.toolbarItems.findIndex(e=>e.name==name)
-		if(r===undefined)
-			throw 'Unable to set select list for '+name;
-		this.toolbarItems[r].options=options;
-		if(selected)
-			this.toolbarItems[r].selected=selected;
+	addToolbarItem(item){
+		item.attachToTable(this);
+		this.toolbarItems.push(item);
+		return this;
 	}
 
 	/**
-	 * Adds a item to the toolbar.
-	 * @param {string} type 
-	 * @param {string} prompt 
-	 * @param {string} name 
+	 * Finds and returns toolbar item.
+	 * @param {string} name Name of toolbar item.
+	 * @returns {DataTableToolbarItem}
 	 */
-	addToolbarItem(type,prompt,name=null){
-		this.toolbarItems.push({
-			type:type,
-			prompt:prompt,
-			name:name});
-		return this;
+	getToolbarItem(name){
+		for(let i=0;i<this.toolbarItems.length;i++){
+			if(this.toolbarItems[i].getName()==name){
+				return this.toolbarItems[i];
+			}
+		}
+		return null;
 	}
 
 	//Add Column types
 
 	/**
 	 * 
-	 * @param {string} name Name of column, to be found in supplied Typer.
-	 * @param {boolean} sortable Is column sortable.
-	 * @param {boolean} searchable Is column searchable.
+	 * @param {DataTableColumn} column Adds column to table
 	 */
-	addColumn(name,sortable=true,searchable=true){
-		if(!this.typer.typeExists(name)){
-			throw 'Typer does not contain "'+name+'"';
+	addColumn(column){
+		column.attachToTable(this);
+		this.columns.push(column);
+		return this;
+	}
+
+	/**
+	 * Gets column definition
+	 * @param {string} name 
+	 * @returns {DataTableColumn}
+	 */
+	getColumn(name){
+		for(let i=0;i<this.columns.length;i++){
+			if(this.columns[i].getName()==name){
+				return this.columns[i];
+			}
 		}
-		if(this.findColumn(name))
-			throw 'Column "'+name+'" already exists';
-		let t=this.typer.getType(name);
-		switch(t){
-			case T.TYPE_CONSTANT:
-				this.addTextColumn(name,t,sortable,searchable);
-				break;
-			case T.TYPE_INT:
-			case T.TYPE_REGEX:
-			case T.TYPE_STRING:
-				if(this.typer.isReadOnly(name)){
-					this.addTextColumn(name,t,sortable,searchable);
-				}
-				else{
-					this.addEditColumn(name,t,sortable,searchable);
-				}
-				break;
-			case T.TYPE_LIST:
-				this.addSelectColumn(name,t,sortable,searchable);
-				break;
-		}
-		return this;
+		return null;
 	}
-	
-	addLinkColumn(name){
-		if(this.findColumn(name))
-			throw 'Column "'+name+'" already exists';
-		this.columns.push({
-			name:name,
-			sortable:false,
-			searchable:false,
-			type:COLUMN_LINK,
-			dataType:null
-		});
-		return this;
-	}
-
-	addTextColumn(name,dataType,sortable=true,searchable=true){
-		this.columns.push({
-			name:name,
-			sortable:sortable,
-			searchable:searchable,
-			type:COLUMN_TEXT,
-			dataType:dataType
-		});
-		return this;
-	}
-
-	addEditColumn(name,dataType,sortable=true,searchable=true){
-		this.columns.push({
-			name:name,
-			sortable:sortable,
-			searchable:searchable,
-			type:COLUMN_EDIT,
-			dataType:dataType
-		});
-		return this;
-	}
-
-	addSelectColumn(name,dataType,sortable=true,searchable=true){
-		if(!this.typer.typeExists(name))
-			throw 'Typer does not contain "'+name+'"';
-		if(this.findColumn(name))
-			throw 'Column "'+name+'" already exists';
-		this.columns.push({
-			name:name,
-			sortable:sortable,
-			type:COLUMN_SELECT,
-			searchable:searchable,
-			dataType:dataType
-		});
-		return this;
-	}
-
-	addCheckColumn(name,sortable=true,searchable=true){
-		if(!this.typer.typeExists(name))
-			throw 'Typer does not contain "'+name+'"';
-		if(this.findColumn(name))
-			throw 'Column "'+name+'" already exists';
-		this.columns.push({
-			name:name,
-			sortable:sortable,
-			type:COLUMN_CHECK
-		});
-		return this;
-	}
-
 
 	//Add rows
 
@@ -233,28 +154,13 @@ export class DataTable extends Component{
 			this.changeRow(tr,2,this.isRowSelected(id));
 			this.previousRow=2;
 		}
-		tr.addEventListener('click',e=>{this.eventSelectRow(e)});
+		tr.addEventListener('click',e=>{this.eventClickRow(e)});
 		tr.dataset.id=id;
-		this.columns.forEach(c=>{
-			let dataName=this.typer.getDataName(c.name);
+		this.columns.forEach(e=>{
 			let td=DH.appendNew(tr,'td');
-			td.dataset.id=id;
-			td.dataset.name=c.name;
-			td.dataset.value=data[c.name];
-			switch(c.type){
-				case COLUMN_TEXT:
-					this.renderText(td,data[dataName]);
-					break;
-				case COLUMN_EDIT:
-					this.renderEdit(td,data[dataName]);
-					break;
-				case COLUMN_SELECT:
-					this.renderSelect(td,c.name,data[dataName]);
-					break;
-				case COLUMN_LINK:
-					this.renderLink(td,data[c.name]);
-					break;
-			}
+			let value=data[this.dp.getDataName(e.getName())];
+			td.dataset.value=value
+			e.renderCell(td,value);
 		});
 	}
 
@@ -269,95 +175,18 @@ export class DataTable extends Component{
 		this.renderColumnHeaders(tr);
 	}
 
-	renderSearch(column,th){
-		let div=DH.appendNew(th,'div');
-		div.className=this.classNames.searchButton;
-		div.appendChild(this.elements.search.cloneNode(true));
-		let sdiv=DH.appendNew(div,'div');
-		sdiv.className=this.classNames.searchOutline;
-		sdiv.dataset.name=column.name;
-		switch(column.type){
-			case COLUMN_TEXT:
-			case COLUMN_EDIT:
-				let input=DH.appendNew(sdiv,'input');
-				input.type='search';
-				input.placeholder='Search...';
-				input.addEventListener('input',e=>this.eventInputSearch(e));
-				break;
-			case COLUMN_SELECT:
-				let select=this.typer.generateFormElement(column.name);
-				let first=DH.firstNewWithText(select,'option','Search...');
-				first.value=DEFAULT_SELECT_SEARCH_VALUE;
-				select.value=DEFAULT_SELECT_SEARCH_VALUE;
-				sdiv.appendChild(select);
-				let reset=DH.appendNewWithText(sdiv,'button',C.UI_DELETE_GLYPH);
-				select.addEventListener('change',e=>this.eventChangeSearchSelect(e));
-				reset.addEventListener('click',e=>this.eventClickSearchCancel(e));
-		}
-	}
-
 	renderColumnHeaders(tr){
-		this.columns.forEach(c=>{
+		this.columns.forEach(e=>{
 			let th=DH.appendNew(tr,'td');
-			th.dataset.name=c.name;
-			if(c.searchable){
-				this.renderSearch(c,th);
-			}
-			let t=DH.appendNewWithText(th,'span',this.typer.getPrompt(c.name));
-			t.className=this.classNames.titleClass;
-			if(!c.sortable)			
-				return;
-			t.addEventListener('click',e=>{this.eventClickTitle(e)});
-			if(c.name==this.currentSort){
-				if(this.currentDirection=='ASC'){
-					th.appendChild(this.elements.up.cloneNode(true));
-				}
-				else{
-					th.appendChild(this.elements.down.cloneNode(true));
-				}
-			}
+			e.renderHeader(th);
 		});
 	}
 
 	renderToolbar(tr){
 		let th=DH.appendNew(tr,'th');
 		th.colSpan=this.columns.length;
-		let b;
-		this.toolbarItems.forEach(ti=>{
-			switch(ti.type){
-				case 'selectAll':
-					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.addEventListener('click',e=>this.eventSelectAll(e));
-					break;
-				case 'selectNone':
-					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.addEventListener('click',e=>this.eventSelectNone(e));
-					break;
-				case 'delete':
-					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.addEventListener('click',e=>this.eventDelete(e));
-					break;
-				case 'custom':
-					b=DH.appendNewWithText(th,'button',ti.prompt);
-					b.dataset.name=ti.name;
-					b.addEventListener('click',e=>this.eventCustomButton(e));
-					break;
-				case COLUMN_SELECT:
-					let span=DH.appendNewWithText(th,span,ti.prompt);
-					let s=DH.appendNew(span,COLUMN_SELECT);
-					if('options' in ti){
-						ti.options.forEach(e=>{
-							let op=DH.appendNewWithText(s,'option',e.text);
-							op.value=e.value;
-						});
-					}
-					if('selected' in ti)
-						s.value=ti.selected;
-					if(ti.handler)
-						s.addEventListener('change',
-							e=>this.eventToolbarSelectChange(e,ti.handler));
-					break;
-			}
+		this.toolbarItems.forEach(e=>{
+			e.render(th);
 		});
 	}
 
@@ -381,34 +210,24 @@ export class DataTable extends Component{
 	}
 
 	clearBody(){
+		this.selectedRows=[];
 		DH.clearChildNodes(this.elements.tbody);
-	}
-
-	renderLink(td,value){
-		let a=DH.appendNewWithText(td,'a',value);
-		a.href='#';
-		a.addEventListener('click',e=>{this.eventClickLink(e)});
-	}
-
-	renderText(td,value){
-		DH.appendText(td,value);
-	}
-
-	renderEdit(td,value){
-		let sp=DH.appendNewWithText(td,'span',value)
-		sp.addEventListener('dblclick',e=>{this.eventDoubleClickText(e)});
-	}
-
-	renderSelect(td,name,value){
-		let select=this.typer.generateFormElement(name,false);
-		td.appendChild(select);
-		select.value=value;
-		select.addEventListener('change',e=>{this.eventChangeSelect(e)});
 	}
 
 
 	//Utilities
 
+	updateFilters(){
+		let filters=[];
+		this.columns.forEach(e=>{
+			let f={};
+			f.name=e.getName();
+			f.value=e.getFilterValue();
+			if(f.value!=null)
+				filters.push(f);
+		});
+		this.controller.setFilters(filters);
+	}
 
 	findColumn(name){
 		let r=null;
@@ -464,6 +283,7 @@ export class DataTable extends Component{
 	}
 
 	selectAllRows(){
+		this.selectedRows=[];
 		let trs=this.elements.tbody.getElementsByTagName('tr');
 		for(let i=0;i<trs.length;i++){
 			this.selectRow(trs[i].dataset.id);
@@ -471,63 +291,49 @@ export class DataTable extends Component{
 		}
 	}
 
+	async refresh(){
+		await this.controller.refresh();
+	}
 
-	//timeouts
+	async changeCellValue(id,name,value){
+		if(this.getColumn(name).isMultiEdit&&this.selectedRows.length>1&&
+			this.isRowSelected(id)){
+			await this.controller.changeMultipleCellValue(this.selectedRows,name,value);
+		}
+		else{
+			await this.controller.changeCellValue(id,name,value);
+		}
+	}
 
-	timeoutTriggerSearch(){
-		this.setFilters();
-		this.waiting=false;
+	async createRow(){
+		await this.controller.createRow();
+	}
+
+	async deleteRows(){
+		await this.controller.deleteRows(this.selectedRows);
+	}
+
+	clickLink(id,name){
+		this.controller.clickLink(id,name);
+	}
+
+	clickToolbarButton(name){
+		this.controller.clickToolbarButton(name);
+	}
+
+	changeToolbarSelect(name,value){
+		this.controller.changeToolbarSelect(name,value);
 	}
 
 	//events
-
-	eventClickLink(e,handler){
+	eventClickPage(e){
 		e.preventDefault();
-		let d=e.target.parentNode.dataset;
-		this.controller.clickLink(d.name,d.id,d.value);
+		this.viewOffset=parseInt(e.target.dataset.viewOffset);
+		this.controller.setView(this.viewSize,this.viewOffset);
+		this.controller.refresh();
 	}
-
-	eventInputSearch(e){
-		let n=e.target.parentNode.dataset.name;
-		if(e.target.value.length==0){
-			delete this.searches[n];
-			window.setTimeout(()=>this.timeoutTriggerSearch(),SEARCH_DELAY);
-			return;
-		}
-		if(!(n in this.searches)){
-			this.searches[n]={currentValue:e.target.value};
-		}
-		else{
-			this.searches[n].currentValue=e.target.value;
-		}
-		if(!this.waiting){
-			window.setTimeout(()=>this.timeoutTriggerSearch(),SEARCH_DELAY);
-			this.waiting=true;
-		}
-	}
-
-
-	eventCustomButton(e){
-		this.controller.clickCustomButton(e.target.dataset.name);
-	}
-
-	eventToolbarSelectChange(e,handler){
-		handler(e.target.value);
-	}
-
-	eventDelete(e){
-		this.controller.delete(this.selectedRows);
-	}
-
-	eventSelectNone(e){
-		this.unselectAllRows();
-	}
-
-	eventSelectAll(e){
-		this.selectAllRows();
-	}
-
-	eventSelectRow(e){
+	
+	eventClickRow(e){
 		if(e.target&&e.target.tagName.toLowerCase()=='td'){
 			let tr=e.target.parentNode;
 			let id=tr.dataset.id;
@@ -542,119 +348,6 @@ export class DataTable extends Component{
 			}
 		}
 	}
-
-	eventChangeSearchSelect(e){
-		let n=e.target.parentNode.dataset.name;
-		if(n in this.searches&&e.target.value==DEFAULT_SELECT_SEARCH_VALUE){
-			delete this.searches[n];
-			this.timeoutTriggerSearch();
-			return;
-		}
-		if(!(n in this.searches)){
-			this.searches[n]={};
-		}
-		this.searches[n].currentValue=e.target.value;
-		this.setFilters();
-	}
-
-	async eventChangeSelect(e){
-		let td=e.target.parentNode;
-		let old=td.dataset.value;
-		let nv=e.target.value;
-		try{
-			let r=await this.controller.change(td.dataset.id,
-				this.typer.getDataName(td.dataset.name),nv);
-		}
-		catch(err){
-			alert('Error: '+err);
-			e.target.value=old;
-			return;
-		}
-	}
-
-	eventClickSearchCancel(e){
-		e.target.parentNode.firstChild.value=DEFAULT_SELECT_SEARCH_VALUE;
-		delete this.searches[e.target.parentNode.dataset.name];
-		this.setFilters();
-	}
-
-	eventClickTitle(e){
-		let n=e.target.parentNode.dataset.name;
-		let direction;
-		if(this.currentDirection=='ASC'){
-			direction='DESC';
-		}
-		else{
-			direction='ASC';
-		}
-		this.renderHead();
-		this.setSort(n,direction);
-	}
-
-	eventClickPage(e){
-		e.preventDefault();
-		this.viewOffset=parseInt(e.target.dataset.viewOffset);
-		this.controller.setView(this.viewSize,this.viewOffset);
-		this.controller.refresh();
-	}
-
-	eventDoubleClickText(e){
-		let p=e.target.parentNode;
-		let id=p.dataset.id;
-		let name=p.dataset.name;
-		let value=p.dataset.value;
-		DH.clearChildNodes(p);
-		let input=this.typer.generateFormElement(name);
-		p.appendChild(input);
-		input.focus();
-		input.value=value;
-		input.addEventListener('blur',e2=>{this.eventBlurTextEdit(e2)});
-		input.addEventListener('keyup',e3=>{this.eventKeyupTextEdit(e3)});
-	}
-
-	async eventFinishEdit(e){
-		let td=e.target.parentNode;
-		let nv=e.target.value;
-		try{
-			let r=await this.controller.change(td.dataset.id,
-				this.typer.getDataName(td.dataset.name),nv);
-			if(typeof r==='string'){
-				e.target.setCustomValidity(r);
-				e.target.focus();
-				return;
-			}
-		}
-		catch(error){
-			alert('Error: '+error);
-			this.eventCancelEdit(e);
-			return;
-		}
-		DH.clearChildNodes(td);
-		td.dataset.value=nv;
-		this.renderEdit(td,nv);
-	}
-
-	eventCancelEdit(e){
-		let td=e.target.parentNode;
-		let nv=e.target.value;
-		DH.clearChildNodes(td);
-		this.renderEdit(td,td.dataset.value);
-	}
-
-	eventBlurTextEdit(e){
-		this.eventFinishEdit(e);
-	}
-
-	eventKeyupTextEdit(e){
-		if(e.key=='Enter'){
-			e.preventDefault();
-			this.eventFinishEdit(e);
-		}
-		else if(e.key=='Escape'){
-			e.preventDefault();
-			this.eventCancelEdit(e);
-		}
-	}
 }
 
 export class DataTableController extends Component{
@@ -662,30 +355,44 @@ export class DataTableController extends Component{
 		super();
 		this.view={};
 		this.sort={};
+		this.filters=[];
 	}
 
 	async refresh(){
 		alert('not implemented');
 	}
 
-	async change(rowId,name,value){
-		alert('change not implemented');
+	async changeCellValue(id,name,value){
+		alert('changeCellValue not implemented');
 	}
 
-	async delete(ids){
-		alert('delete not implemented');
+	async changeMultipleCellValue(iDs,name,value){
+		alert('changeMultipleCellValue not implemented');
 	}
 
-	clickCustomButton(name){
-		alert('clickCustomButton not implemented');
+	async createRow(){
+		alert('createRow not implemented');
 	}
 
-	clickLink(name,id,value){
+	async deleteRows(ids){
+		alert('deleteRows not implemented');
+	}
+
+	clickToolbarButton(name){
+		alert('clickToolbarButton not implemented');
+	}
+
+	changeToolbarSelect(name,value){
+		alert('changeToolbarSelect not implemented');
+	}
+
+	clickLink(name,id){
 		alert('clickLink not implemented');
 	}
 
-	setFilters(filters){
+	async setFilters(filters){
 		this.filters=filters;
+		await this.refresh();
 	}
 
 	setSort(name,direction){
@@ -696,5 +403,618 @@ export class DataTableController extends Component{
 	setView(size,offset){
 		this.view.size=size;
 		this.view.offset=offset;
+	}
+}
+
+export class DataTableColumn extends Component{
+	constructor(name,dp,sort=true,filter=true,multiEdit=false){
+		super();
+		this.name=name;
+		this.dp=dp;
+		this.sort=sort;
+		this.filter=filter;
+		this.multiEdit=multiEdit;
+		this.currentFilter=null;
+		this.currentSort=false;
+		this.currentSortDirection=C.DIRECTION_UP;
+		this.expectingElement('up','Sort up arrow.',false,DH.newWithText('span','\u21E7'))
+		.expectingElement('down','Sort down arrow.',false,DH.newWithText('span','\u21E9'))
+		.expectingElement('search','Search.',false,DH.newWithText('span',String.fromCodePoint(0x1F50D)))
+		.expectingClassName('searchButton','',false,'search-button')
+		.expectingClassName('searchOutline','',false,'search-outline')
+		.expectingClassName('titleClass','',false,'search-button');
+	}
+
+	getRowId(from){
+		let c=0;
+		let r=from;
+		while(r=r.parentNode){
+			if(r.tagName.toLowerCase()=='tr'){
+				return r.dataset.id;
+			}
+			c++;
+			if(c>5){
+				//this should never happen?
+				throw "Gone too deep in finding rowId";
+			}
+		}
+	}
+
+	/**
+	 * Gets name of column
+	 * @returns {string} Name of column
+	 */
+	getName(){
+		return this.name;
+	}
+
+	/**
+	 * Checks if column allows multi row changes.
+	 * @returns {boolean} True if you can edit multiple rows.
+	 */
+	isMultiEdit(){
+		return this.multiEdit;
+	}
+
+	/**
+	 * Attaches data table.
+	 * @param {DataTable} table 
+	 */
+	attachToTable(table){
+		this.table=table;
+	}
+
+	renderCell(container,value){
+
+	}
+
+	renderHeader(container){
+		if(this.filter){
+			let div=DH.appendNew(container,'div');
+			div.className=this.classNames.searchButton;
+			div.appendChild(this.elements.search.cloneNode(true));
+			let sdiv=DH.appendNew(div,'div');
+			sdiv.className=this.classNames.searchOutline;
+			sdiv.dataset.name=this.name;
+			this.renderFilter(sdiv);
+		}
+		let sp=DH.appendNewWithText(container,'span',
+			this.dp.getPrompt(this.name));
+		if(this.sort){
+			sp.addEventListener('click',e=>{this.eventClickHeader(e)})
+		}
+		if(this.currentSort){
+			if(this.currentSortDirection==C.DIRECTION_UP){
+				container.appendChild(this.elements.up.cloneNode(true));
+			}
+			else{
+				container.appendChild(this.elements.down.cloneNode(true));
+			}
+		}
+	}
+
+	renderFilter(container){
+		
+	}
+
+	getFilterValue(){
+		return this.currentFilter;
+	}
+
+	setFilterValue(value){
+		this.currentFilter=value;
+	}
+
+	updateFilter(){
+		this.table.updateFilters();
+	}
+
+	setSort(current,direction){
+		this.currentSort=current;
+		this.currentSortDirection=direction;
+	}
+
+	//events
+
+	eventClickHeader(e){
+		if(this.currentSort==true){
+			if(this.currentSortDirection==C.DIRECTION_UP){
+				this.currentSortDirection=C.DIRECTION_DOWN;
+			}
+			else{
+				this.currentSortDirection=C.DIRECTION_UP;
+			}
+		}
+		this.currentSort=true;
+		this.table.setSort(this.name,this.currentSortDirection);
+	}
+}
+
+export class DataTableColumnLink extends DataTableColumn{
+	constructor(name,dp,sort=false,filter=false){
+		super(name,dp,sort,filter,false);
+	}
+
+	renderCell(container,value){
+		let a=DH.appendNewWithText(container,'a',value);
+		a.href='#';
+		a.addEventListener('click',e=>this.clickLink(e));
+	}
+
+	//events
+
+	clickLink(e){
+		this.table.clickLink(this.name,this.getRowId(e.target.parentNode));
+	}
+}
+
+export class DataTableColumnSelect extends DataTableColumn{
+	/**
+	 * 
+	 * @param {string} name Name of column
+	 * @param {DataProperties} dp DataProperties
+	 * @param {boolean} sort Column can be sorted.
+	 * @param {boolean} filter Column can be filtered
+	 * @param {boolean} multiEdit Column edit over multiple rows.
+	 */
+	constructor(name,dp,sort=true,filter=true,multiEdit=false,readOnly=false){
+		super(name,dp,sort,filter,multiEdit);
+		this.readOnly=readOnly;
+		this.currentOptions=[];
+	}
+
+	/**
+	 * Adds a select option - this overrides dp.
+	 * @param {string} value value of option.
+	 * @param {string} text text of option.
+	 */
+	addOption(value,text){
+		if(!this.currentOptions){
+			this.currentOptions=[];
+		}
+		this.currentOptions.push({
+			value:value,
+			text:text
+		});
+	}
+
+	findOptionByValue(value){
+		for(let i=0;i<this.currentOptions.length;i++){
+			if(this.currentOptions[i].value==value){
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	deleteOption(value){
+		let i=this.findOptionByValue(value);
+		if(i==-1)
+			return;
+		this.currentOptions.splice(i,1);
+	}
+
+	deleteAllOptions(){
+		this.currentOptions=[];
+	}
+
+	makeSelect(container){
+		let select=DH.appendNew(container,'select');
+		this.currentOptions.forEach(e=>{
+			let o=DH.appendNewWithText(select,'option',e.text);
+			o.value=e.value;
+		});
+		return select;
+	}
+
+	renderCell(container,value){
+		if(this.readOnly){
+			let i=this.findOptionByValue(value);
+			DH.appendText(container,this.currentOptions[i].text);
+		}
+		else{
+			let select=this.makeSelect(container);
+			select.value=value;
+			select.addEventListener('change',e=>this.eventChangeCellSelect(e));
+		}
+	}
+
+	renderFilter(container){
+		let select=this.makeSelect(container);
+		let def=DH.firstNewWithText(select,'option','--Search--');
+		def.value='--Search--';
+		select.addEventListener('change',e=>this.eventChangeFilterSelect(e));
+		let button=DH.appendNewWithText(container,'button',C.UI_DELETE_GLYPH);
+		button.type=button;
+		button.addEventListener('click',e=>this.eventClickRemoveFilterButton(e));
+	}
+
+	//events
+
+	eventChangeCellSelect(e){
+		this.table.changeCellValue(this.getRowId(e.target),this.name,e.target.value);
+	}
+
+	eventChangeFilterSelect(e){
+		if(e.target.value=='--Search--'){
+			this.currentFilter=null;
+		}
+		else{
+			this.currentFilter=e.target.value;
+		}
+		this.updateFilter();
+	}
+
+	eventClickRemoveFilterButton(e){
+		e.target.parentNode.firstChild.value='--Search--';
+		this.currentFilter=null;
+		this.updateFilter();
+	}
+}
+
+export class DataTableColumnText extends DataTableColumn{
+	constructor(name,dp,sort=true,filter=true){
+		super(name,dp,sort,filter,false);
+	}
+
+	renderCell(container,value){
+		DH.appendText(container,value);
+	}
+
+	renderFilter(container){
+		let input=this.dp.generateFormElement(this.name);
+		container.appendChild(input);
+		input.addEventListener('input',e=>this.eventInputFilter(e))
+		let button=DH.appendNewWithText(container,'button',C.UI_DELETE_GLYPH);
+		button.type=button;
+		button.addEventListener('click',e=>this.eventClickRemoveFilterButton(e));
+	}
+
+	//events	
+	timeoutTriggerFilter(){
+		this.waiting=false;
+		this.updateFilter();
+	}
+
+	eventClickRemoveFilterButton(e){
+		e.target.previousSibling.value='';
+		this.currentFilter=null;
+		this.updateFilter();
+	}
+
+	eventInputFilter(e){
+		if(e.target.value.length==0){
+			this.currentFilter=null;
+			window.setTimeout(()=>this.timeoutTriggerFilter(),SEARCH_DELAY);
+			return;
+		}
+		if(!this.waiting){
+			this.currentFilter=e.target.value;
+			window.setTimeout(()=>this.timeoutTriggerFilter(),SEARCH_DELAY);
+			this.waiting=true;
+		}
+	}
+}
+
+export class DataTableColumnEdit extends DataTableColumnText{
+	constructor(name,dp,sort=true,filter=true,multiEdit=false){
+		super(name,dp,sort,filter,false);
+		this.multiEdit=multiEdit;
+	}
+
+	renderCell(container,value){
+		let sp=DH.appendNewWithText(container,'span',value);
+		sp.addEventListener('dblclick',e=>{this.eventDoubleClickText(e)});
+	}
+
+	//events
+	eventDoubleClickText(e){
+		let value=e.target.parentNode.dataset.value;
+		let td=e.target.parentNode;
+		DH.clearChildNodes(td);
+		let input=this.dp.generateFormElement(this.name);
+		td.appendChild(input);
+		input.focus();
+		input.value=value;
+		this.blurIgnore=false;
+		input.addEventListener('blur',e2=>{this.eventBlurTextEdit(e2)});
+		input.addEventListener('keyup',e3=>{this.eventKeyupTextEdit(e3)});
+	}
+
+	async eventFinishEdit(e){
+		await this.table.changeCellValue(this.getRowId(e.target),
+			this.dp.getDataName(this.name),
+			e.target.value).then(()=>{
+				let td=e.target.parentNode;
+				DH.clearChildNodes(td);
+				td.dataset.value=e.target.value;
+				this.renderCell(td,td.dataset.value);
+				})
+			.catch(()=>this.eventCancelEdit(e));
+	}
+
+	eventCancelEdit(e){
+		let td=e.target.parentNode;
+		DH.clearChildNodes(td);
+		this.renderCell(td,td.dataset.value);
+	}
+
+	eventBlurTextEdit(e){
+		if(!this.blurIgnore)
+			this.eventFinishEdit(e);
+	}
+
+	eventKeyupTextEdit(e){
+		if(e.key=='Enter'){
+			this.blurIgnore=true;
+			e.preventDefault();
+			this.eventFinishEdit(e);
+		}
+		else if(e.key=='Escape'){
+			this.blurIgnore=true;
+			e.preventDefault();
+			this.eventCancelEdit(e);
+		}
+	}
+}
+
+
+export class DataTableToolbarItem extends Component{
+	/**
+	 * 
+	 * @param {string} name Name of component
+	 */
+	constructor(name){
+		super();
+		this.name=name;
+		this.expectingClassName('spanContainer',
+			'Span to hold toolbar item',false,'table-toolbar-span');
+	}
+
+	getName(){
+		return this.name;
+	}
+
+	/**
+	 * Attaches data table.
+	 * @param {DataTable} table 
+	 */
+	attachToTable(table){
+		this.table=table;
+	}
+
+	makeSpan(container){
+		let sp=DH.appendNew(container,'span');
+		sp.className=this.classNames.spanContainer;
+		return sp;
+	}
+
+	/**
+	 * renders item and appends to container.
+	 * @param {HTMLElement} container 
+	 */
+	render(container){
+		let sp=this.makeSpan(container);
+		DH.appendText('DataTableToolbarItem class not designed to be directly used.');
+	}
+}
+
+export class DataTableToolbarSelectRows extends DataTableToolbarItem{
+	/**
+	 * Creates select buttons
+	 * @param {string} name Name of toolbar item.
+	 * @param {boolean} none Select none/unselect all button.
+	 * @param {boolean} all Select all button.
+	 * @param {boolean} invert Invert selection *Not implemented yet*
+	 */
+	constructor(name,none,all,invert){
+		super(name);
+		this.none=none;
+		this.all=all;
+		this.invert=invert;
+	}
+
+	render(container){
+		let sp=this.makeSpan(container);
+		if(this.all){
+			let all=DH.appendNewWithText(sp,'button',C.UI_SELECTALL_GLYPH);
+			all.type='button';
+			all.addEventListener('click',e=>this.clickAllButton(e));
+		}
+		if(this.none){
+			let none=DH.appendNewWithText(sp,'button',C.UI_UNSELECTALL_GLYPH);
+			none.type='button';
+			none.addEventListener('click',e=>this.clickNoneButton(e));
+		}
+	}
+
+	//events
+
+	clickAllButton(e){
+		this.table.selectAllRows();
+	}
+	clickNoneButton(e){
+		this.table.unselectAllRows();
+	}
+}
+
+export class DataTableToolbarNewDelete extends DataTableToolbarItem{
+	/**
+	 * Creates select buttons
+	 * @param {string} name Name of toolbar item.
+	 * @param {boolean} newRow New/create button.
+	 * @param {boolean} deleteRow Delete button.
+	 */
+	constructor(name,newRow=true,deleteRow=true){
+		super(name);
+		this.newRow=newRow;
+		this.deleteRow=deleteRow;
+	}
+
+	render(container){
+		let sp=this.makeSpan(container);
+		if(this.newRow){
+			let newRow=DH.appendNewWithText(sp,'button',C.UI_CREATE_GLYPH);
+			newRow.type='button';
+			newRow.addEventListener('click',e=>this.clickCreateButton(e));
+		}
+		if(this.deleteRow){
+			let deleteRow=DH.appendNewWithText(sp,'button',C.UI_DELETE_GLYPH);
+			deleteRow.type='button';
+			deleteRow.addEventListener('click',e=>this.clickDeleteButton(e));
+		}
+	}
+
+	//events
+
+	clickCreateButton(e){
+		this.table.createRow();
+	}
+	clickDeleteButton(e){
+		this.table.deleteRows();
+	}
+}
+
+export class DataTableToolbarButtons extends DataTableToolbarItem{
+	/**
+	 * Creates buttons
+	 * @param {string} name Name of toolbar item.
+	 */
+	constructor(name){
+		super(name);
+		this.buttons=[];
+	}
+
+	/**
+	 * 
+	 * @param {string} name Name of button to find
+	 * @returns {number} Returns index of button;
+	 */
+	findButton(name){
+		for(let i=0;i<this.buttons.length;i++){
+			if(this.buttons[i].name==name)
+				return i;
+		}
+	}
+
+	/**
+	 * Adds a button to this group.
+	 * @param {string} name Name of button
+	 * @param {string} prompt Label/text for button.
+	 * @param {Function} callback Callback for button press.
+	 * @returns {DataTableToolbarButtons} Returns this for chaining.
+	 */
+	addButton(name,prompt){
+		this.buttons.push({
+			name:name,
+			prompt:prompt
+		});
+		return this;
+	}
+
+	/**
+	 * removes a button, and refreshes table unless requested not to.
+	 * @param {*} name Name of button to remove.
+	 * @param {*} refresh Refresh the table if true, false otherwise.
+	 */
+	removeButton(name,refresh=true){
+		let i=this.findButton(name);
+		this.buttons.splice(i,1);
+		if(refresh)
+			this.table.renderHead();
+	}
+
+	render(container){
+		let sp=this.makeSpan(container);
+		this.buttons.forEach(e=>{
+			let b=DH.appendNewWithText(sp,'button',e.prompt);
+			b.type='button';
+			b.dataset.name=e.name;
+			b.addEventListener('click',e=>this.eventClickButton(e));
+		});
+	}
+
+	//events
+
+	eventClickButton(e){
+		e.preventDefault();
+		this.table.clickToolbarButton(e.target.dataset.name);
+	}
+}
+
+export class DataTableToolbarSelect extends DataTableToolbarItem{
+	/**
+	 * Creates buttons
+	 * @param {string} name Name of toolbar item.
+	 * @param {Function} callback callback for when select changes, sends value of selected option.
+	 * @param {string} prompt Prompt text, optional.
+	 */
+	constructor(name,prompt=null){
+		super(name);
+		this.prompt=null;
+		this.options=[];
+		this.select=null;
+	}
+
+	findOption(value){
+		for(let i=0;i<this.options.length;i++){
+			if(this.options[i].value==value)
+				return i;
+		}
+		return -1;
+	}
+
+	addOption(value,text){
+		this.options.push({
+			value:value,
+			text:text
+		});
+		if(this.select){
+			this.renderOption(value,text);
+		}
+	}
+
+	removeOption(value){
+		let i=this.findOption(value);
+		if(i==-1)
+			return;
+		this.options.splice(i,1);
+		if(this.select){
+			for(let j=0;j<this.select.childNodes.length;j++){
+				if(this.select.childNodes[j].value==i){
+					this.select.removeChild(this.select.childNodes[j]);
+				}
+			}
+		}
+	}
+
+	removeAllOptions(){
+		let v=this.options;
+		v.forEach(e=>{
+			this.removeOption(e.value);
+		});
+	}
+
+	renderOption(value,text){
+		let o=DH.appendNewWithText(this.select,'option',text);
+		o.value=value;
+	}
+
+	render(container){
+		let sp=this.makeSpan(container);
+		if(this.prompt)
+			DH.appendText(sp,this.prompt);
+		this.select=DH.appendNew(sp,'select');
+		this.select.addEventListener('change',e=>this.eventChangeSelect(e));
+		this.options.forEach(e=>{
+			this.renderOption(e.value,e.text);
+		});
+	}
+
+
+	//events
+
+	eventChangeSelect(e){
+		this.table.changeToolbarSelect(this.name,e.target.value);
 	}
 }

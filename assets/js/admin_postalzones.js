@@ -3,7 +3,7 @@ import {PostalZoneRelationTable,PostalZoneRelationTyper} from './postalzones.js'
 
 let cdiPZ=new CommonDataInterface('PostalZones','/api/PostalZones');
 let cdiPZM=new CommonDataInterface('PostalZoneMembers','/api/PostalZoneMembers');
-let pzTyper=new PostalZoneRelationTyper();
+let pzTyper=new PostalZoneRelationDataProperties();
 let pzTable=new PostalZoneRelationTable(pTyper,pCDI,
 
 

@@ -5,36 +5,41 @@ namespace Lib;
 class PostalCarriers extends TypicalDataInterface{
 	public const schema='shopman';
 	public const table='postal_carriers';
-	public const id='postal_carrier_id';
-	public const name='postal_carrier_name';
-	public const description='description';
+	public const id=['name'=>'postal_carrier_id','type'=>'integer','table'=>self::table];
+	public const name=['name'=>'postal_carrier_name','type'=>'text','table'=>self::table];
+	public const description=['name'=>'description','type'=>'text','table'=>self::table];
 
 	public function __construct(\PDO $db){
-		$this->Init($db,[
-				self::id=>'integer',
-				self::name=>'text',
-				self::description=>'text'],
+		$this->Init($db,[self::id,self::name,self::description],
 			self::id,self::table,self::schema);
 	}
 
-	public function Get(array $columns,array $where,array $order,int $limit=-1,int $offset=-1):array{
-		$key=array_search(PostalZones::name,$columns);
-		if($key!==false){
-			$this->sql->Start()->StartSub()
-				->Select(['array_to_json(array_agg('.PostalZones::name.'))'])
-				->From(PostalZones::table,PostalZones::schema,'p')
+	public function Get(array $parameters,array $filters,array $order,int $limit=-1,int $offset=-1):array{
+		$p=PostalZones::name['name'];
+		if(isset($parameters[PostalZones::name['name']])){
+			$this->sql->Start()
+				->AddTemplate('toJson','array_to_json(array_agg({$C0}))','column')
+				->StartSub()
+				->Select()
+				->Template('toJson',PostalZones::name)
+				->From(PostalZones::table,PostalZones::schema)
 				->Where()
-				->Column(PostalCarriers::id)
-				->CompareColumn(self::id,'c')
+				->Explicit()
+				->Compare(PostalZones::carrierid,'=',self::id)
+				->Explicit(false)
 				->EndSub()
 				->Push('sub');
-			array_splice($columns,$key,1);
+			unset($parameters[PostalZones::name['name']]);
+		}
+		else{
+			$this->sql->Push('sub');
 		}
 		$st=$this->sql
-			->Select($columns)
-			->AppendColumn($this->sql->Pop('sub'),'',PostalZones::name)
-			->From('','','c')
-			->WhereAnd($where)
+			->Select()
+			->Column($parameters)
+			->Column($this->sql->Define($this->sql->Pop('sub')),PostalZones::name)
+			->From()
+			->WhereAnd($filters)
 			->Order($order)
 			->Limit($limit,$offset)
 			->GetStatement();

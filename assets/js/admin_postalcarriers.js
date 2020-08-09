@@ -1,6 +1,6 @@
 import * as C from './constants.js';
 import {CommonDataInterface as CDI} from './commondatainterface.js';
-import {Typer} from './typer.js';
+import {DataProperties} from './dataproperties.js';
 import {PostalCarriersTable, PostalZoneMappingTable, PostalCarrierForm, PostalZonesForm} from './postalcarriers.js';
 
 class AdminPostalCarriers{
@@ -13,23 +13,23 @@ class AdminPostalCarriers{
 	}
 
 	start(){
-		this.carrierTyper=new Typer();
-		this.carrierTyper.addInteger(C.POSTAL_CARRIERS_ID,false,'-1','Carrier ID',true)
-			.addString(C.POSTAL_CARRIERS_NAME,false,'---','Carrier Name',false,'Must be 2-100 characters.',2,100)
-			.addString(C.POSTAL_CARRIERS_DESCRIPTION,false,'---','Carrier Description',false,
+		this.carrierDP=new DataProperties();
+		this.carrierDP.addInteger(C.POSTAL_CARRIERS_ID,false,'Carrier ID')
+			.addString(C.POSTAL_CARRIERS_NAME,false,'Carrier Name','Must be 2-100 characters.',2,100)
+			.addString(C.POSTAL_CARRIERS_DESCRIPTION,false,'Carrier Description',
 				'Must be no longer than 200 characters.',null,200)
-			.addString(C.POSTAL_ZONES_NAME,false,'---','Postal Zones',false,'Must be 2-100 characters',2,100)
-			.addConstant(C.POSTAL_CARRIERS_MAPPING,false,'Zone Mapping')
-			.addConstant(C.COUNTRIES_NAME,false,'Country Name')
-			.addConstant(C.COUNTRIES_CODE2)
-			.addConstant(C.COUNTRIES_CODE3)
-			.addList(C.REGION_ID,false,-1,'Region',true)
-			.addList(C.POSTAL_ZONES_ID,false,-1,'Postal Zone',false);
-			this.carrierForm=new PostalCarrierForm(this.carrierTyper,this.carrierCDI);
-			this.zoneForm=new PostalZonesForm(this.carrierTyper,this.zoneCDI);
-			this.postalMappingTable=new PostalZoneMappingTable(this.carrierTyper,this.regionsCDI,
+			.addString(C.POSTAL_ZONES_NAME,false,'Postal Zones','Must be 2-100 characters',2,100)
+			.addOther(C.POSTAL_CARRIERS_MAPPING,false,'Zone Mapping')
+			.addString(C.COUNTRIES_NAME,false,'Country Name')
+			.addString(C.COUNTRIES_CODE2,false,'ISO Code 2')
+			.addString(C.COUNTRIES_CODE3,false,'ISO Code 3')
+			.addInteger(C.REGION_ID,false,'Region')
+			.addInteger(C.POSTAL_ZONES_ID,false,'Postal Zone');
+			this.carrierForm=new PostalCarrierForm(this.carrierDP,this.carrierCDI);
+			this.zoneForm=new PostalZonesForm(this.carrierDP,this.zoneCDI);
+			this.postalMappingTable=new PostalZoneMappingTable(this.carrierDP,this.regionsCDI,
 				this.zoneCDI,this.zoneMapCDI);
-			this.carrierTable=new PostalCarriersTable(this.carrierTyper,this.carrierCDI,
+			this.carrierTable=new PostalCarriersTable(this.carrierDP,this.carrierCDI,
 				this.carrierForm,this.zoneForm,this.postalMappingTable);
 	}
 }

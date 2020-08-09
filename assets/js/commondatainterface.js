@@ -1,3 +1,5 @@
+import * as DP from './dataproperties.js';
+
 const QUERY_OK=0;
 const QUERY_INSERT_FAIL_DUPLICATE=1;
 const QUERY_UPDATE_NOTHING_CHANGED=2;
@@ -23,12 +25,12 @@ export class CommonDataInterface{
 	}
 
 	update(){
-		this.currentQuery={action:'update',set:{}};
+		this.currentQuery={action:'update',set:[]};
 		return this;
 	}
 
 	get(){
-		this.currentQuery={action:'get'};
+		this.currentQuery={action:'get',parameters:[]};
 		return this;
 	}
 
@@ -37,56 +39,67 @@ export class CommonDataInterface{
 		return this;
 	}
 
-	set(column,value){
-		this.currentQuery.set[column]=value;
+	set(parameter,value){
+		this.currentQuery.set.push([parameter,value]);
 		return this;
 	}
 
-	columns(columns){
-		if(columns instanceof Array){
-			this.currentQuery.columns=columns;
+	parameters(p){
+		if(p instanceof Array){
+			this.currentQuery.parameters.concat(p);
 		}
-		else if(typeof columns==='string'){
-			this.currentQuery.columns=[columns];
+		else if(typeof p==='string'&&p!='*'){
+			this.currentQuery.parameters.push(p);
 		}
 		else{
-			this.currentQuery.columns=[];
+			this.currentQuery.parameters='*';
 		}
 		return this;
 	}
 
 	values(values){
-		let v=values;
-		if(!(values in this.currentQuery)){
+		if('values' in this.currentQuery===false){
 			this.currentQuery.values=[];
 		}
-		let remove=[];
-		for(const k in v){
-			if(this.currentQuery.columns.find(e=>k==e)===undefined)
-				remove.push(k);
-		}
-		remove.forEach(e=>{delete v[e]});
-		this.currentQuery.values.push(v);
+		this.currentQuery.values.push(values);
 		return this;
 	}
 
-	where(name,comparison,operator=null){
+	filters(filters,dp,callback=null){
+		for(let i=0;i<filters.length;i++){
+			let type=dp.getType(filters[i].name);
+			let comp;
+			let operator;
+			if(type==DP.TYPE_INT){
+				comp=filters[i].value;
+				operator='=';
+			}
+			else{
+				comp='%'+filters[i].value+'%';
+				operator='ILIKE';
+			}
+			this.filter(filters[i].name,operator,comp);
+		}
+		return this;
+	}
+
+	filter(name,operator,comparison){
 		if(!this.currentQuery.filters){
-			this.currentQuery.filters={};
+			this.currentQuery.filters=[];
 		}
-		let filter={};
-		filter.comparison=comparison;
-		if(operator!=null)
-			filter.operator=operator;
-		this.currentQuery.filters[name]=filter;
+		let filter=[];
+		filter.push(name);
+		filter.push(operator);
+		filter.push(comparison);
+		this.currentQuery.filters.push(filter);
 		return this;
 	}
 
-	order(by,direction='ASC'){
-		if(!this.currentQuery.order){
-			this.currentQuery.order=[];
+	sort(by,direction='ASC'){
+		if(!this.currentQuery.sort){
+			this.currentQuery.sort=[];
 		}
-		this.currentQuery.order.push({by:by,direction:direction});
+		this.currentQuery.sort.push([by,direction]);
 		return this;
 	}
 
@@ -131,22 +144,22 @@ export class CommonDataInterface{
 	}
 
 	async send(){
+		this.currentData=null;
 		try{
 			let r=await fetch(this.objectUrl,
 			{method:'post',headers:{'Content-Type':'application/json'},
 			body:JSON.stringify(this.currentQuery)});
 			if(!r.ok)
-				throw new Error(r.statusText);
+				throw r.statusText;
 			let d=await r.json();
 			if(!d.ok){
-				this.systemError(d.code,d.text);
-				return false;
+				throw this.systemError(d.code,d.text);
 			}
 			if(d.queryResponseCode!==QUERY_OK){
-				this.queryError(d.queryResponseCode);
-				return false;
+				throw this.queryError(d.queryResponseCode);
 			}
 			this.currentData=d;
+			return this.currentData.data;
 		}
 		catch(e){
 			console.log(e);
@@ -156,20 +169,15 @@ export class CommonDataInterface{
 	}
 
 	systemError(code,message){
-		let msg;
 		if(code>=1000){
-			msg='Server error ('+code+'): '+message;
+			return 'System Error: Server error ('+code+'): '+message;
 		}
 		else{
-			msg='Client error ('+code+'): '+message;
+			return 'System Error: Client error ('+code+'): '+message;
 		}
-		console.log(msg);
-		alert(msg);
 	}
 
 	queryError(code){
-		let msg='Query did not complete ('+code+'): '+queryErrors[code];
-		console.log(msg);
-		alert(msg);
+		return 'Query error: Query did not complete ('+code+'): '+queryErrors[code];
 	}
 }

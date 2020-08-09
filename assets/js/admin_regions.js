@@ -18,9 +18,9 @@ class Admin_Regions{
 		this.typer=null;
 		this.table=null;
 		this.tableElements={
-			thead:document.getElementById('admin_regions_thead'),
-			tbody:document.getElementById('admin_regions_tbody'),
-			tfoot:document.getElementById('admin_regions_tfoot')
+			thead:document.getElementById('regions_thead'),
+			tbody:document.getElementById('regions_tbody'),
+			tfoot:document.getElementById('regions_tfoot')
 		};
 		this.formContainer=document.getElementById('region_form');
 		this.cdiRegions=new CDI('Regions','/api/Regions');
@@ -28,13 +28,13 @@ class Admin_Regions{
 	}
 
 	async init(){
-		this.initTyper();
+		this.initDataProperties();
 		this.initForm();
 		this.initTable();
 	}
 
-	initTyper(regions){
-		this.typer=new Typer();
+	initDataProperties(regions){
+		this.typer=new DataProperties();
 		this.typer.addInteger(ID,0,'Country ID',null)
 			.addString(NAME,'-','Region Name','Region name must be 2 to 100 characters.',2,100);
 	}

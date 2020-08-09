@@ -1,5 +1,5 @@
 <?php
-namespace Meerkat\Config;
+namespace Config;
 const server_default_object='Index';
 const server_qs_language='lang';
 const server_qs_object='d7';

@@ -1,0 +1,114 @@
+Date : 2020-07-30 20:23:22
+Directory : /home/aaron/shopman
+Total : 72 files,  10463 codes, 843 comments, 735 blanks, all 12041 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| Log                |          1 |      5,112 |          0 |          1 |      5,113 |
+| JavaScript         |         17 |      2,483 |        283 |        292 |      3,058 |
+| PHP                |         48 |      2,158 |        555 |        351 |      3,064 |
+| CSS                |          2 |        507 |          4 |         88 |        599 |
+| XML                |          2 |        194 |          1 |          3 |        198 |
+| JSON with Comments |          1 |          8 |          0 |          0 |          8 |
+| Markdown           |          1 |          1 |          0 |          0 |          1 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                          | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                             |         72 |     10,463 |        843 |        735 |     12,041 |
+| api                                                           |          5 |        185 |          0 |         45 |        230 |
+| assets                                                        |         22 |      3,404 |        288 |        418 |      4,110 |
+| assets/css                                                    |          3 |        727 |          4 |        123 |        854 |
+| assets/images                                                 |          2 |        194 |          1 |          3 |        198 |
+| assets/js                                                     |         17 |      2,483 |        283 |        292 |      3,058 |
+| config                                                        |          4 |         47 |          0 |         10 |         57 |
+| lib                                                           |          8 |        353 |          0 |         50 |        403 |
+| meerkat                                                       |          9 |      1,071 |        544 |        140 |      1,755 |
+| meerkat/core                                                  |          9 |      1,071 |        544 |        140 |      1,755 |
+| objects                                                       |          6 |         61 |          0 |         20 |         81 |
+| templates                                                     |          6 |         77 |          0 |          6 |         83 |
+| views                                                         |          6 |         83 |          0 |         29 |        112 |
++---------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                      | language           | code       | comment    | blank      | total      |
++---------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /home/aaron/shopman/README.md                                 | Markdown           |          1 |          0 |          0 |          1 |
+| /home/aaron/shopman/api/api_countries.php                     | PHP                |         42 |          0 |          9 |         51 |
+| /home/aaron/shopman/api/api_postalcarriers.php                | PHP                |         36 |          0 |          9 |         45 |
+| /home/aaron/shopman/api/api_postalzonemapping.php             | PHP                |         44 |          0 |          9 |         53 |
+| /home/aaron/shopman/api/api_postalzones.php                   | PHP                |         34 |          0 |          9 |         43 |
+| /home/aaron/shopman/api/api_regions.php                       | PHP                |         29 |          0 |          9 |         38 |
+| /home/aaron/shopman/assets/css/admin.css                      | CSS                |        288 |          4 |         62 |        354 |
+| /home/aaron/shopman/assets/css/default.css                    | CSS                |        219 |          0 |         26 |        245 |
+| /home/aaron/shopman/assets/css/default.css.php                | PHP                |        220 |          0 |         35 |        255 |
+| /home/aaron/shopman/assets/images/menubutton.svg              | XML                |         85 |          0 |          1 |         86 |
+| /home/aaron/shopman/assets/images/menubuttoni.svg             | XML                |        109 |          1 |          2 |        112 |
+| /home/aaron/shopman/assets/js/admin_countries.js              | JavaScript         |         52 |          0 |          6 |         58 |
+| /home/aaron/shopman/assets/js/admin_postage.js                | JavaScript         |          6 |          0 |          1 |          7 |
+| /home/aaron/shopman/assets/js/admin_postalcarriers.js         | JavaScript         |         34 |          0 |          3 |         37 |
+| /home/aaron/shopman/assets/js/admin_postalzones.js            | JavaScript         |          8 |          0 |          4 |         12 |
+| /home/aaron/shopman/assets/js/admin_regions.js                | JavaScript         |        114 |          0 |         15 |        129 |
+| /home/aaron/shopman/assets/js/commondatainterface.js          | JavaScript         |        145 |         12 |         18 |        175 |
+| /home/aaron/shopman/assets/js/component.js                    | JavaScript         |         82 |         55 |         14 |        151 |
+| /home/aaron/shopman/assets/js/constants.js                    | JavaScript         |         46 |          0 |         12 |         58 |
+| /home/aaron/shopman/assets/js/countries.js                    | JavaScript         |        112 |         14 |         10 |        136 |
+| /home/aaron/shopman/assets/js/datatable.js                    | JavaScript         |        604 |         28 |         74 |        706 |
+| /home/aaron/shopman/assets/js/dh.js                           | JavaScript         |        106 |         12 |         15 |        133 |
+| /home/aaron/shopman/assets/js/form.js                         | JavaScript         |        317 |         25 |         32 |        374 |
+| /home/aaron/shopman/assets/js/postalcarriers.js               | JavaScript         |        254 |         21 |         23 |        298 |
+| /home/aaron/shopman/assets/js/split.js                        | JavaScript         |        177 |          3 |         16 |        196 |
+| /home/aaron/shopman/assets/js/tabs.js                         | JavaScript         |         51 |          1 |          7 |         59 |
+| /home/aaron/shopman/assets/js/tree.js                         | JavaScript         |        163 |          2 |         16 |        181 |
+| /home/aaron/shopman/assets/js/typer.js                        | JavaScript         |        212 |        110 |         26 |        348 |
+| /home/aaron/shopman/config/config-local.php                   | PHP                |         16 |          0 |          3 |         19 |
+| /home/aaron/shopman/config/config-server.php                  | PHP                |         16 |          0 |          3 |         19 |
+| /home/aaron/shopman/config/config.php                         | PHP                |          7 |          0 |          1 |          8 |
+| /home/aaron/shopman/config/manifest.php                       | PHP                |          8 |          0 |          3 |         11 |
+| /home/aaron/shopman/init.php                                  | PHP                |         17 |          0 |          3 |         20 |
+| /home/aaron/shopman/lib/countries.php                         | PHP                |         49 |          0 |          7 |         56 |
+| /home/aaron/shopman/lib/definition.php                        | PHP                |          5 |          0 |          3 |          8 |
+| /home/aaron/shopman/lib/postage.php                           | PHP                |         54 |          0 |          8 |         62 |
+| /home/aaron/shopman/lib/postalcarriers.php                    | PHP                |         51 |          0 |          5 |         56 |
+| /home/aaron/shopman/lib/postalzonemapping.php                 | PHP                |         50 |          0 |          6 |         56 |
+| /home/aaron/shopman/lib/postalzones.php                       | PHP                |         27 |          0 |          4 |         31 |
+| /home/aaron/shopman/lib/regions.php                           | PHP                |         23 |          0 |          4 |         27 |
+| /home/aaron/shopman/lib/typicaldatainterface.php              | PHP                |         94 |          0 |         13 |        107 |
+| /home/aaron/shopman/meerkat/core/columndefinition.php         | PHP                |         57 |         61 |         12 |        130 |
+| /home/aaron/shopman/meerkat/core/commondatainterface.php      | PHP                |        313 |         49 |         26 |        388 |
+| /home/aaron/shopman/meerkat/core/commondatainterfaceerror.php | PHP                |          7 |         21 |          3 |         31 |
+| /home/aaron/shopman/meerkat/core/manifest.php                 | PHP                |         29 |         32 |          5 |         66 |
+| /home/aaron/shopman/meerkat/core/pdohelper.php                | PHP                |         66 |         44 |          8 |        118 |
+| /home/aaron/shopman/meerkat/core/pdostring.php                | PHP                |        433 |        265 |         58 |        756 |
+| /home/aaron/shopman/meerkat/core/sqlformer.php                | PHP                |         15 |         20 |          5 |         40 |
+| /home/aaron/shopman/meerkat/core/view.php                     | PHP                |         48 |         32 |         10 |         90 |
+| /home/aaron/shopman/meerkat/core/webapp.php                   | PHP                |        103 |         20 |         13 |        136 |
+| /home/aaron/shopman/objects/admin_catalogue.php               | PHP                |         12 |          0 |          5 |         17 |
+| /home/aaron/shopman/objects/admin_countries.php               | PHP                |         10 |          0 |          3 |         13 |
+| /home/aaron/shopman/objects/admin_postage.php                 | PHP                |         10 |          0 |          3 |         13 |
+| /home/aaron/shopman/objects/admin_postalcarriers.php          | PHP                |         10 |          0 |          3 |         13 |
+| /home/aaron/shopman/objects/admin_regions.php                 | PHP                |         10 |          0 |          3 |         13 |
+| /home/aaron/shopman/objects/index.php                         | PHP                |          9 |          0 |          3 |         12 |
+| /home/aaron/shopman/runwebapp.php                             | PHP                |         41 |         11 |         10 |         62 |
+| /home/aaron/shopman/shopman.code-workspace                    | JSON with Comments |          8 |          0 |          0 |          8 |
+| /home/aaron/shopman/tellme.php                                | PHP                |          3 |          0 |          3 |          6 |
+| /home/aaron/shopman/templates/admin_bot.php                   | PHP                |          2 |          0 |          1 |          3 |
+| /home/aaron/shopman/templates/admin_top.php                   | PHP                |         23 |          0 |          1 |         24 |
+| /home/aaron/shopman/templates/default_bottom.php              | PHP                |          2 |          0 |          1 |          3 |
+| /home/aaron/shopman/templates/default_top.php                 | PHP                |          6 |          0 |          1 |          7 |
+| /home/aaron/shopman/templates/defaultbot.php                  | PHP                |          2 |          0 |          1 |          3 |
+| /home/aaron/shopman/templates/defaulttop.php                  | PHP                |         42 |          0 |          1 |         43 |
+| /home/aaron/shopman/time.log                                  | Log                |      5,112 |          0 |          1 |      5,113 |
+| /home/aaron/shopman/views/admin_countries.php                 | PHP                |         15 |          0 |          5 |         20 |
+| /home/aaron/shopman/views/admin_postage.php                   | PHP                |         13 |          0 |          5 |         18 |
+| /home/aaron/shopman/views/admin_postalcarriers.php            | PHP                |         24 |          0 |          7 |         31 |
+| /home/aaron/shopman/views/admin_postalzones.php               | PHP                |         13 |          0 |          5 |         18 |
+| /home/aaron/shopman/views/admin_regions.php                   | PHP                |         13 |          0 |          5 |         18 |
+| /home/aaron/shopman/views/index.php                           | PHP                |          5 |          0 |          2 |          7 |
+| Total                                                         |                    |     10,463 |        843 |        735 |     12,041 |
++---------------------------------------------------------------+--------------------+------------+------------+------------+------------+

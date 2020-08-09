@@ -12,31 +12,37 @@ class Api_PostalZones extends CDI{
 
 	public function __construct(PostalZones $pz){
 		$this->pz=$pz;
-		$id=(new ColumnDefinition(PostalZones::id,true,true,false,false))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get','delete','update']);
-		$name=(new ColumnDefinition(PostalZones::name,true,true,true,true))->Type(self::TYPE_STRING)->Filterable(['ILIKE','=','!='],['get']);
-		$cid=(new ColumnDefinition(PostalCarriers::id,true,true,false,true))->Type(self::TYPE_INT)->Filterable(['=','!=','IN'],['get']);
-		$this->AddColumnDefinition($id);
-		$this->AddColumnDefinition($name);
-		$this->AddColumnDefinition($cid);
 		$this->ReceiveData();
 	}
 
 	protected function Get(){
-		$d=$this->pz->Get($this->columns,$this->filters,$this->order,
+		$this->Parameter(PostalZones::id)->Parameter(PostalZones::name)
+			->Parameter(PostalCarriers::id)->ParameterNotEmpty();
+		$this->Filter(PostalZones::id)->Filter(PostalZones::name)
+			->Filter(PostalCarriers::id);
+		$this->Sort(PostalZones::id)->Sort(PostalZones::name)
+			->Sort(PostalCarriers::id);
+		$this->Limit();
+		
+		$d=$this->pz->Get($this->parameters,$this->filters,$this->sorts,
 			$this->limit,$this->offset);
 		$this->ReturnData($d,count($d),$this->pz->CountWhere($this->filters));
 	}
 
 	protected function Update(){
+		$this->Set(PostalZones::name,true);
+		$this->Filter(PostalZones::id,true);
 		$v=$this->pz->Update($this->sets,$this->filters);
 		$this->Return(true,$v);
 	}
 
 	protected function Delete(){
+		$this->Filter(PostalZones::id,true);
 		$this->Return(true,$this->pz->Delete($this->filters));
 	}
 
 	protected function Insert(){
-		$this->Return(true,$this->pz->Insert($this->columns,$this->values));
+		$this->Value(PostalZones::name,true)->Value(PostalCarriers::id,true)->ValidateValues();
+		$this->Return(true,$this->pz->Insert($this->inserts,$this->values));
 	}
 }

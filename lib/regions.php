@@ -6,11 +6,11 @@ use \Meerkat\Core\CommonDataInterface as CDI;
 class Regions extends TypicalDataInterface{
 	public const schema='shopman';
 	public const table='regions';
-	public const id='region_id';
-	public const name='name';
+	public const id=['name'=>'region_id','type'=>'integer','table'=>self::table];
+	public const name=['name'=>'name','type'=>'text','table'=>self::table];
 
 	public function __construct(\PDO $db){
-		$this->Init($db,[self::id=>'int',self::name=>'text'],self::id,
+		$this->Init($db,[self::id,self::name],self::id,
 			self::table,self::schema);
 	}
 

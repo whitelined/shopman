@@ -35,28 +35,31 @@ abstract class TypicalDataInterface{
 
 	public function Count():int{
 		$st=$this->sql->Start()
-			->Select(['COUNT(*) as count'])
+			->Select()
+			->Column($this->sql->Define('COUNT(*)'),'count')
 			->From()
 			->GetStatement();
 		$st->execute();
 		return $st->fetch(\PDO::FETCH_ASSOC)['count'];
 	}
 
-	public function CountWhere(array $where):int{
+	public function CountWhere(array $filters):int{
 		$st=$this->sql->Start()
-			->Select(['COUNT(*) as count'])
+			->Select()
+			->Column($this->sql->Define('COUNT(*)'),'count')
 			->From()
-			->WhereAnd($where)
+			->Where()
+			->WhereAnd($filters)
 			->GetStatement();
 		$st->execute();
 		return $st->fetch(\PDO::FETCH_ASSOC)['count'];
 	}
 
-	public function Insert(array $columns,array $values){
+	public function Insert(array $parameters,array $values){
 		$rowCount=0;
 		$st=$this->sql->Start()
 			->Insert()
-			->InsertColumns($columns)
+			->InsertColumns($parameters)
 			->Values($values)
 			->GetStatement();
 		$res=$this->pdoh->ExecuteStatementCatch($st,[23505],$rowCount);
@@ -65,11 +68,13 @@ abstract class TypicalDataInterface{
 		return CDI::QUERY_OK;
 	}
 
-	public function Get(array $columns,array $where,array $order,int $limit=-1,int $offset=-1):array{
+	public function Get(array $parameters,array $filters,array $order,int $limit=-1,int $offset=-1):array{
 		$st=$this->sql->Start()
-			->Select($columns)
+			->Select()
+			->Column($parameters)
 			->From()
-			->WhereAnd($where)
+			->Where()
+			->WhereAnd($filters)
 			->Order($order)
 			->Limit($limit,$offset)
 			->GetStatement();
@@ -77,13 +82,13 @@ abstract class TypicalDataInterface{
 		return $st->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
-	public function Update(array $set,array $where){
+	public function Update(array $set,array $filters){
 		$rowCount=0;
 		$st=$this->sql->Start()
 			->Update()
 			->Set($set)
-			->Where($this->defaultId)
-			->CompareValue($where[$this->defaultId])
+			->Where()
+			->Compare($this->defaultId,$filters[$this->defaultId['name']][1],$filters[$this->defaultId['name']][2])
 			->GetStatement();
 		$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
 		if($rowCount=1)
@@ -91,12 +96,12 @@ abstract class TypicalDataInterface{
 		return CDI::QUERY_UPDATE_NOTHING_CHANGED;
 	}
 
-	public function Delete(array $where){
+	public function Delete(array $filters){
 		$rowCount=0;
 		$st=$this->sql->Start()
 			->Delete()
-			->Where($this->defaultId)
-			->CompareValue($where[$this->defaultId])
+			->Where()
+			->Compare($this->defaultId,$filters[$this->defaultId['name']][1],$filters[$this->defaultId['name']][2])
 			->GetStatement();
 		$this->pdoh->ExecuteStatementCatch($st,[],$rowCount);
 		if($rowCount=1)
